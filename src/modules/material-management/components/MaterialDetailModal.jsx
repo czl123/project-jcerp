@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Info, Calendar, Lightbulb, User, Tag, Box, Link2, History, Package, Search, Edit3, CheckCircle2, UserCircle2, ExternalLink, Copy, Check, Save, RotateCcw } from 'lucide-react';
+import { X, Info, Calendar, Lightbulb, User, Tag, Box, Link2, History, Package, Search, Edit3, CheckCircle2, UserCircle2, ExternalLink, Copy, Check, Save, RotateCcw, Sparkles, ShieldCheck, FileText } from 'lucide-react';
 import { SelectRow, FormInputRow, TextareaRow, DimensionInput, WeightInputRow, ImageUploader } from './FormComponents.jsx';
 
 // ===================== 模拟数据字典 =====================
@@ -280,15 +280,55 @@ const MaterialDetailModal = ({ material, onClose }) => {
                        <InfoItem label="建议物流方式" value={formData.general.suggestedLogistics} />
                     </div>
                  </div>
-                 <div>
-                    <SubTitle title="其他信息" en="Other Information" color="green" />
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100">
-                       <InfoItem label="产品要点" value={formData.remarks.sellingPoints} fieldPath="remarks.sellingPoints" editType="textarea" span={2} />
-                       <InfoItem label="质量要求点" value={formData.remarks.qualityReq} fieldPath="remarks.qualityReq" editType="textarea" span={2} />
-                       <InfoItem label="规格型号" value={formData.remarks.specModel} fieldPath="remarks.specModel" />
-                       <InfoItem label="标签描述" value={formData.remarks.labelDesc} fieldPath="remarks.labelDesc" />
+                 <div className="space-y-4">
+                    <SubTitle title="其他信息" en="Additional Details" color="green" />
+                    <div className="grid grid-cols-2 gap-6">
+                       {/* 描述与标识卡片 */}
+                       <div className="flex flex-col gap-3">
+                          <div className="flex items-center gap-2 px-1 text-blue-600 font-bold text-[11px] uppercase tracking-wider">
+                             <FileText size={14} /> 核心描述与标识
+                          </div>
+                          <div className="flex-1 bg-blue-50/20 p-4 rounded-2xl border border-blue-100/50 shadow-sm space-y-4">
+                             <div className="space-y-1.5">
+                                <div className="text-[10px] text-blue-400 font-bold ml-1 flex items-center gap-1 uppercase">
+                                   <Sparkles size={10} /> 营销核心卖点
+                                </div>
+                                <InfoItem label="产品要点" value={formData.remarks.sellingPoints} fieldPath="remarks.sellingPoints" editType="textarea" span={4} />
+                             </div>
+                             <div className="space-y-1.5 pt-2 border-t border-blue-100/30">
+                                <div className="text-[10px] text-blue-400 font-bold ml-1 flex items-center gap-1 uppercase">
+                                   <Tag size={10} /> 仓储识别标识
+                                </div>
+                                <InfoItem label="入库短标签描述" value={formData.remarks.inboundShortDesc} fieldPath="remarks.inboundShortDesc" span={4} />
+                             </div>
+                          </div>
+                       </div>
+
+                       {/* 生产与采购辅助卡片 */}
+                       <div className="flex flex-col gap-3">
+                          <div className="flex items-center gap-2 px-1 text-emerald-600 font-bold text-[11px] uppercase tracking-wider">
+                             <ShieldCheck size={14} /> 生产规范与下单参考
+                          </div>
+                          <div className="flex-1 bg-emerald-50/20 p-4 rounded-2xl border border-emerald-100/50 shadow-sm space-y-4">
+                             <div className="space-y-1.5">
+                                <div className="text-[10px] text-emerald-400 font-bold ml-1 flex items-center gap-1 uppercase">
+                                   <Search size={10} /> 采购快速下单参考
+                                </div>
+                                <div className="bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/30">
+                                   <InfoItem label="规格型号" value={formData.remarks.specModel} fieldPath="remarks.specModel" span={4} copyable />
+                                </div>
+                             </div>
+                             <div className="space-y-1.5 pt-2 border-t border-emerald-100/30">
+                                <div className="text-[10px] text-emerald-400 font-bold ml-1 flex items-center gap-1 uppercase">
+                                   <CheckCircle2 size={10} /> 质量与生产要求
+                                </div>
+                                <InfoItem label="质量要求点" value={formData.remarks.qualityReq} fieldPath="remarks.qualityReq" editType="textarea" span={4} />
+                             </div>
+                          </div>
+                       </div>
                     </div>
                  </div>
+
               </div>
             </div>
 
