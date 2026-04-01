@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Info, Calendar, Lightbulb, User, Tag, Box, Link2, History, Package, Search, Edit3, CheckCircle2, UserCircle2, ExternalLink, Copy, Check, Save, RotateCcw, Sparkles, ShieldCheck, FileText } from 'lucide-react';
+import { X, Info, Calendar, Lightbulb, User, Tag, Box, Link2, History, Package, Search, Edit3, CheckCircle2, UserCircle2, ExternalLink, Copy, Check, Save, RotateCcw, Sparkles, ShieldCheck, FileText, HelpCircle } from 'lucide-react';
 import { SelectRow, FormInputRow, TextareaRow, DimensionInput, WeightInputRow, ImageUploader } from './FormComponents.jsx';
 
 // ===================== 模拟数据字典 =====================
@@ -141,14 +141,14 @@ const MaterialDetailModal = ({ material, onClose }) => {
   };
 
   // 核心展示项组件 (支持详情/编辑/复制)
-  const InfoItem = ({ label, value, fieldPath, editType = 'input', options, span = 1, copyable = false, required = false }) => {
+  const InfoItem = ({ label, value, fieldPath, editType = 'input', options, span = 1, copyable = false, required = false, help }) => {
     const isFieldCopying = copyFeedback === label;
 
     if (isEditing) {
       // 编辑模式渲染
       if (editType === 'select') return <div className={`px-2 py-1 col-span-${span}`}><SelectRow label={label} required={required} options={options} value={value} onChange={(e) => updateField(fieldPath, e.target.value)} /></div>;
       if (editType === 'textarea') return <div className={`px-2 py-1 col-span-${span}`}><TextareaRow label={label} value={value} onChange={(e) => updateField(fieldPath, e.target.value)} /></div>;
-      return <div className={`px-2 py-1 col-span-${span}`}><FormInputRow label={label} required={required} value={value} onChange={(e) => updateField(fieldPath, e.target.value)} /></div>;
+      return <div className={`px-2 py-1 col-span-${span}`}><FormInputRow label={label} required={required} value={value} help={help} onChange={(e) => updateField(fieldPath, e.target.value)} /></div>;
     }
 
     // 详情模式渲染
@@ -156,7 +156,14 @@ const MaterialDetailModal = ({ material, onClose }) => {
       <div className={`group flex items-start gap-3 py-1.5 px-2 border-b border-slate-50/50 text-[11px] col-span-${span} relative hover:bg-blue-50/30 transition-colors`}>
         <div className="w-24 shrink-0 text-right flex items-center justify-end gap-1">
           {required && <span className="text-red-500 font-bold">*</span>}
-          <span className="text-slate-400 leading-relaxed">{label}:</span>
+          <div className="flex items-center gap-1 group/label">
+            <span className="text-slate-400 leading-relaxed truncate">{label}:</span>
+            {help && (
+               <div title={help} className="text-slate-300 hover:text-blue-500 transition-colors">
+                  <HelpCircle size={10} />
+               </div>
+            )}
+          </div>
         </div>
         <div className="flex-1 flex items-center gap-2 overflow-hidden">
            <span className={`text-slate-700 font-semibold break-all leading-relaxed ${label === '产品名称' ? 'text-[12px] text-blue-700' : ''}`}>{value || '-'}</span>
@@ -313,7 +320,7 @@ const MaterialDetailModal = ({ material, onClose }) => {
                        <InfoItem label="图案" value={formData.keyAttrs.pattern} fieldPath="keyAttrs.pattern" />
                        <InfoItem label="颜色" value={formData.keyAttrs.color} fieldPath="keyAttrs.color" />
                        <InfoItem label="尺码" value={formData.keyAttrs.size} fieldPath="keyAttrs.size" />
-                       <InfoItem label="包装数量" value={formData.keyAttrs.packQty} fieldPath="keyAttrs.packQty" />
+                       <InfoItem label="包装数量" value={formData.keyAttrs.packQty} fieldPath="keyAttrs.packQty" help={"示例1:1pack\n示例2:1pack+2pack+3pack"} />
                     </div>
                  </div>
                  <div>
@@ -355,7 +362,13 @@ const MaterialDetailModal = ({ material, onClose }) => {
                              <div className="text-[10px] text-blue-400 font-bold ml-1 flex items-center gap-1 uppercase">
                                 <Tag size={10} /> 仓储识别标识
                              </div>
-                             <InfoItem label="入库短标签描述" value={formData.remarks.inboundShortDesc} fieldPath="remarks.inboundShortDesc" span={4} />
+                             <InfoItem 
+                                label="入库标签短描述" 
+                                value={formData.remarks.inboundShortDesc} 
+                                fieldPath="remarks.inboundShortDesc" 
+                                span={4} 
+                                help={"平板电脑保护套类：【适用品牌或对象】+【型号】+ 【款式】+【主材料】+【图案】+【颜色】+【包装数量】\n非平板电脑保护套类：手动录入"}
+                             />
                           </div>
                        </div>
 
@@ -366,7 +379,14 @@ const MaterialDetailModal = ({ material, onClose }) => {
                                 <Search size={10} /> 采购快速下单参考
                              </div>
                              <div className="bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/30">
-                                <InfoItem label="规格型号" value={formData.remarks.specModel} fieldPath="remarks.specModel" span={4} copyable />
+                                <InfoItem 
+                                   label="规格型号" 
+                                   value={formData.remarks.specModel} 
+                                   fieldPath="remarks.specModel" 
+                                   span={4} 
+                                   copyable 
+                                   help={"非平板电脑保护套类：【适用品牌或对象】 + 【型号】 + 【款式】 + 【图案】 + 【颜色】 + 【主材料】 + 【色号】 + 【尺码】 + 【包装数量】 + 【规格】+【版本】\n平板电脑保护套类：【适用品牌或对象】 + 【型号】 + 【款式】 + 【主材料】 + 【图案】 + 【颜色】 + 【包装数量】 + 【版本】"}
+                                />
                              </div>
                           </div>
                           <div className="space-y-1.5 pt-2 border-t border-emerald-100/30">
