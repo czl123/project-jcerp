@@ -25,6 +25,9 @@ const MaterialDetailModal = ({ material, onClose }) => {
     spu: material?.spu || 'TC1837',
     code: material?.code || 'TC260588',
     status: '正常',
+    syncStatus: '已同步',
+    version: 'V1.0',
+    marketingLevel: 'A级',
     identical: { category: material?.cat || '手机配件', name: material?.name || '手机壳', style: material?.style || '防摔款', material: material?.material || 'TPU', brand: material?.brand || '苹果', model: material?.model || 'iPhone 15' },
     keyAttrs: { company: 'MoKo', pattern: '纯色', color: '黑色', size: '标准', packQty: '1' },
     general: { festival: '无', season: '四季通用', battery: '否', ce: '是', machine: 'iPhone 15', materialDetail: 'TPU底壳', colorCode: '#000', spec: '标准' },
@@ -173,6 +176,44 @@ const MaterialDetailModal = ({ material, onClose }) => {
           {/* 右侧主内容区 */}
           <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-5 space-y-16 scroll-smooth no-scrollbar text-[12px]">
             
+            {/* 🎯 顶部固定悬浮概览条 - 润色增强版 */}
+            <div className="sticky top-0 z-50 bg-gradient-to-r from-blue-50/90 via-white/90 to-white/90 backdrop-blur-md -mx-5 -mt-5 px-8 py-4 border-b border-blue-100/60 flex items-center justify-between shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] animate-in fade-in slide-in-from-top-1 duration-500">
+               <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-3">
+                     <div className="bg-slate-800 text-white px-2.5 py-0.5 rounded-md text-[11px] font-mono tracking-wider shadow-sm ring-1 ring-white/20">
+                        {formData.code}
+                     </div>
+                     <span className="text-[18px] font-black text-slate-800 tracking-tight leading-none">{formData.identical.name}</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-slate-400 font-medium">
+                     <span className="flex items-center gap-1.5 bg-white/50 px-2 py-0.5 rounded border border-slate-100/50"><Box size={13} className="text-blue-400/60"/>{formData.identical.style}</span>
+                     <div className="w-1 h-1 rounded-full bg-blue-200"></div>
+                     <span className="flex items-center gap-1.5">{formData.identical.material}</span>
+                     <div className="w-1 h-1 rounded-full bg-blue-200"></div>
+                     <span className="flex items-center gap-1.5">{formData.identical.brand}</span>
+                     <div className="w-1 h-1 rounded-full bg-blue-200"></div>
+                     <span className="text-slate-500 font-mono tracking-tight bg-slate-100/50 px-1.5 rounded">{formData.identical.model}</span>
+                  </div>
+               </div>
+               
+               <div className="flex items-center gap-2.5">
+                  {/* 状态标签组 - 统一药丸风格 */}
+                  <span className="flex items-center h-6 px-3 rounded-full bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-500/20 text-[10px] font-bold shadow-sm">
+                     <div className="w-1 h-1 rounded-full bg-blue-500 mr-1.5 animate-pulse"></div>
+                     {formData.status}
+                  </span>
+                  <span className="flex items-center h-6 px-3 rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-500/20 text-[10px] font-bold shadow-sm">
+                     {formData.syncStatus}
+                  </span>
+                  <span className="flex items-center h-6 px-3 rounded-full bg-purple-50 text-purple-600 ring-1 ring-inset ring-purple-500/20 text-[10px] font-bold shadow-sm">
+                     {formData.version}
+                  </span>
+                  <span className="flex items-center h-6 px-3 rounded-full bg-orange-50 text-orange-600 ring-1 ring-inset ring-orange-500/20 text-[10px] font-bold shadow-sm">
+                     {formData.marketingLevel}
+                  </span>
+               </div>
+            </div>
+
             {/* 1. 基本信息 */}
             <div ref={sectionRefs['基本信息']} className="space-y-6">
               <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm pb-2 border-b border-slate-100 flex items-center space-x-2 text-slate-800 font-bold text-[14px]">
