@@ -28,6 +28,16 @@ const MaterialDetailModal = ({ material, onClose }) => {
     syncStatus: '已同步',
     version: 'V1.0',
     marketingLevel: 'A级',
+    // 1. 基本信息字段
+    base: {
+      proposalNo: material?.proposalNo || 'TA-202603001',
+      source: material?.source || '自主研发',
+      sourceCode: material?.sourceCode || 'OLD-999-XYZ',
+      createTime: material?.createTime || '2026-03-31',
+      updateTime: material?.updateTime || '2026-03-31',
+      disableTime: material?.disableTime || '-',
+      syncKingdeeTime: material?.syncKingdeeTime || '2026-03-31 10:00'
+    },
     identical: { category: material?.cat || '手机配件', name: material?.name || '手机壳', style: material?.style || '防摔款', material: material?.material || 'TPU', brand: material?.brand || '苹果', model: material?.model || 'iPhone 15' },
     keyAttrs: { company: 'MoKo', pattern: '纯色', color: '黑色', size: '标准', packQty: '1' },
     general: { festival: '无', season: '四季通用', battery: '否', ce: '是', machine: 'iPhone 15', materialDetail: 'TPU底壳', colorCode: '#000', spec: '标准' },
@@ -220,30 +230,32 @@ const MaterialDetailModal = ({ material, onClose }) => {
               </div>
               <div className="space-y-8 px-2">
                  <div>
-                    <SubTitle title="核心档案" en="Basic Info" color="blue" />
-                    <div className="grid grid-cols-3 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
-                       <InfoItem label="SPU" value={formData.spu} copyable />
+                    <SubTitle title="基本信息" en="Basic Info" color="blue" />
+                    <div className="grid grid-cols-4 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
                        <InfoItem label="物料编码" value={formData.code} copyable />
-                       <InfoItem label="物料状态" value={formData.status} editType="select" options={["正常", "停产", "开发中"]} />
-                       <InfoItem label="创建人" value="张三" />
-                       <InfoItem label="创建时间" value="2026-03-31" />
-                       <InfoItem label="更新时间" value="2026-03-31" />
+                       <InfoItem label="提案编号" value={formData.base.proposalNo} copyable />
+                       <InfoItem label="提案来源" value={formData.base.source} />
+                       <InfoItem label="源物料编码" value={formData.base.sourceCode} />
+                       <InfoItem label="创建时间" value={formData.base.createTime} />
+                       <InfoItem label="最后更新时间" value={formData.base.updateTime} />
+                       <InfoItem label="禁用时间" value={formData.base.disableTime} />
+                       <InfoItem label="同步金蝶时间" value={formData.base.syncKingdeeTime} />
                     </div>
                  </div>
                  <div>
                     <SubTitle title="同款属性" en="Identical Attributes" color="blue" />
-                    <div className="grid grid-cols-3 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100">
+                    <div className="grid grid-cols-3 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
                        <InfoItem label="运营大类" value={formData.identical.category} fieldPath="identical.category" editType="select" options={MOCK_CATEGORIES} required />
-                       <InfoItem label="产品名称" value={formData.identical.name} fieldPath="identical.name" required />
+                       <InfoItem label="产品名称" value={formData.identical.name} fieldPath="identical.name" span={2} required copyable />
                        <InfoItem label="款式" value={formData.identical.style} fieldPath="identical.style" />
                        <InfoItem label="主材料" value={formData.identical.material} fieldPath="identical.material" />
                        <InfoItem label="适用品牌或对象" value={formData.identical.brand} fieldPath="identical.brand" />
-                       <InfoItem label="型号" value={formData.identical.model} fieldPath="identical.model" />
+                       <InfoItem label="型号" value={formData.identical.model} fieldPath="identical.model" copyable />
                     </div>
                  </div>
                  <div>
                     <SubTitle title="关键属性" en="Key Attributes" color="orange" />
-                    <div className="grid grid-cols-3 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100">
+                    <div className="grid grid-cols-4 gap-x-4 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100">
                        <InfoItem label="公司品牌" value={formData.keyAttrs.company} fieldPath="keyAttrs.company" editType="select" options={MOCK_COMPANY_BRANDS} />
                        <InfoItem label="图案" value={formData.keyAttrs.pattern} fieldPath="keyAttrs.pattern" />
                        <InfoItem label="颜色" value={formData.keyAttrs.color} fieldPath="keyAttrs.color" />
