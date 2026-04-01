@@ -41,8 +41,32 @@ const MaterialDetailModal = ({ material, onClose }) => {
     identical: { category: material?.cat || '手机配件', name: material?.name || '手机壳', style: material?.style || '防摔款', material: material?.material || 'TPU', brand: material?.brand || '苹果', model: material?.model || 'iPhone 15' },
     keyAttrs: { company: 'MoKo', pattern: '纯色', color: '黑色', size: '标准', packQty: '1' },
     general: { festival: '无', season: '四季通用', battery: '否', ce: '是', machine: 'iPhone 15', materialDetail: 'TPU底壳', colorCode: '#000', spec: '标准' },
-    remarks: { sellingPoints: '1. 防摔；2. 亲肤', qualityReq: '无毛刺', specModel: 'MK-15-BK', labelDesc: 'Case for iPhone' },
-    procurement: { cycle: '15', moq: '500', remark: '首单减半', canInvoice: '是', invoiceUnit: 'PCS', invoiceName: '保护壳', invoiceSpec: 'BK-001', customsMaterial: '塑料' },
+    remarks: { 
+      sellingPoints: '1. 防摔；2. 亲肤', 
+      qualityReq: '无毛刺', 
+      specModel: 'MK-15-BK', 
+      inboundShortDesc: 'Case for iPhone',
+      isBulkSampleReg: '是',
+      isProductSpecReg: '是'
+    },
+    procurement: { 
+      cycle: '15', 
+      moq: '500', 
+      remark: '首单减半', 
+      firstOrderDate: '2026-04-01',
+      firstOrderEstDelivery: '2026-04-15',
+      firstOrderActDelivery: '2026-04-16',
+      combinedOrderType: '同款不同色',
+      combinedOrderMoq: '1000',
+      combinedOrderRemark: '需与A供应商拼单',
+      needInspection: '否',
+      isOriginalBox: '是',
+      canInvoice: '是', 
+      invoiceUnit: 'PCS', 
+      invoiceName: '保护壳', 
+      invoiceSpec: 'BK-001', 
+      customsMaterial: '塑料' 
+    },
     specs: { itemDim: { l: '16', w: '8', h: '1' }, packageDim: { l: '20', w: '10', h: '2' }, netWeight: { value: '0.05', unit: 'kg' }, grossWeight: { value: '0.08', unit: 'kg' }, images: [] }
   });
 
@@ -103,9 +127,12 @@ const MaterialDetailModal = ({ material, onClose }) => {
     // 详情模式渲染
     return (
       <div className={`group flex items-start gap-3 py-1.5 px-2 border-b border-slate-50/50 text-[11px] col-span-${span} relative hover:bg-blue-50/30 transition-colors`}>
-        <span className="text-slate-400 shrink-0 w-24 text-right leading-relaxed">{label}:</span>
+        <div className="w-24 shrink-0 text-right flex items-center justify-end gap-1">
+          {required && <span className="text-red-500 font-bold">*</span>}
+          <span className="text-slate-400 leading-relaxed">{label}:</span>
+        </div>
         <div className="flex-1 flex items-center gap-2 overflow-hidden">
-           <span className="text-slate-700 font-semibold break-all leading-relaxed">{value || '-'}</span>
+           <span className={`text-slate-700 font-semibold break-all leading-relaxed ${label === '产品名称' ? 'text-[12px] text-blue-700' : ''}`}>{value || '-'}</span>
            {copyable && value && (
              <button onClick={() => handleCopy(value, label)} className="p-1 text-slate-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all">
                {isFieldCopying ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
@@ -223,7 +250,7 @@ const MaterialDetailModal = ({ material, onClose }) => {
                </div>
             </div>
 
-            {/* 1. 基本信息 */}
+            {/* 1. 基本信息区块 */}
             <div ref={sectionRefs['基本信息']} className="space-y-6">
               <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm pb-2 border-b border-slate-100 flex items-center space-x-2 text-slate-800 font-bold text-[14px]">
                 <Info size={16} className="text-blue-500" /><span>基本信息</span>
@@ -325,56 +352,100 @@ const MaterialDetailModal = ({ material, onClose }) => {
                        </div>
                     </div>
                  </div>
-
               </div>
             </div>
 
-            {/* 2. 采购信息 (支持编辑切换) */}
+            {/* 2. 采购信息区块 */}
             <div ref={sectionRefs['采购信息']} className="space-y-6">
               <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm pb-2 border-b border-slate-100 flex items-center space-x-2 text-slate-800 font-bold text-[14px]">
-                <Calendar size={16} className="text-blue-500" /><span>采购与供应链</span>
+                <Calendar size={16} className="text-blue-500" /><span>采购信息</span>
               </div>
+              
               <div className="space-y-8 px-2">
+                 
+                 {/* 第一行：双分类卡片矩阵 */}
                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                       <SubTitle title="采购基础" en="Procurement" color="blue" />
-                       <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
-                          <InfoItem label="生产周期" value={`${formData.procurement.cycle} 天`} fieldPath="procurement.cycle" />
-                          <InfoItem label="采购起订量" value={`${formData.procurement.moq} PCS`} fieldPath="procurement.moq" />
-                          <InfoItem label="起订备注" value={formData.procurement.remark} fieldPath="procurement.remark" span={2} />
+                    
+                    {/* 卡片 1: 采购基础规则 与 拼单策略 */}
+                    <div className="bg-slate-50/30 p-5 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+                       <div>
+                          <SubTitle title="首单要求" en="First Order Req" color="blue" />
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                             <InfoItem label="生产周期" value={`${formData.procurement.cycle} 天`} fieldPath="procurement.cycle" />
+                             <InfoItem label="采购起订量" value={`${formData.procurement.moq} PCS`} fieldPath="procurement.moq" />
+                             <InfoItem label="起订量备注" value={formData.procurement.remark} fieldPath="procurement.remark" span={2} />
+                          </div>
+                       </div>
+                       <div className="pt-4 border-t border-slate-100/60">
+                          <SubTitle title="拼单策略" en="Combined Strategy" color="green" />
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                             <InfoItem label="拼单类型" value={formData.procurement.combinedOrderType} />
+                             <InfoItem label="拼单起订量" value={formData.procurement.combinedOrderMoq} />
+                             <InfoItem label="拼单备注" value={formData.procurement.combinedOrderRemark} span={2} />
+                          </div>
                        </div>
                     </div>
-                    <div className="space-y-3">
-                       <SubTitle title="开票信息" en="Invoicing" color="green" />
-                       <div className="grid grid-cols-2 gap-x-2 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
-                          <InfoItem label="能否开票" value={formData.procurement.canInvoice} fieldPath="procurement.canInvoice" editType="select" options={["是", "否"]} />
-                          <InfoItem label="开票单位" value={formData.procurement.invoiceUnit} fieldPath="procurement.invoiceUnit" editType="select" options={["PCS", "SET", "KG"]} />
-                          <InfoItem label="开票品名" value={formData.procurement.invoiceName} fieldPath="procurement.invoiceName" span={2} />
+
+                    {/* 卡片 2: 开票合规 与 商检发货要求 */}
+                    <div className="bg-slate-50/30 p-5 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+                       <div>
+                          <SubTitle title="开票合规" en="Invoicing" color="purple" />
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                             <InfoItem label="能够开票" value={formData.procurement.canInvoice} editType="select" options={["是", "否"]} />
+                             <InfoItem label="开票单位" value={formData.procurement.invoiceUnit} editType="select" options={["PCS", "SET", "KG"]} />
+                             <InfoItem label="开票品名" value={formData.procurement.invoiceName} />
+                             <InfoItem label="报关材质" value={formData.procurement.customsMaterial} />
+                             <InfoItem label="开票规格型号" value={formData.procurement.invoiceSpec} span={2} />
+                          </div>
+                       </div>
+                       <div className="pt-4 border-t border-slate-100/60">
+                          <SubTitle title="商检发货要求" en="Compliance" color="blue" />
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                             <InfoItem label="是否需要商检" value={formData.procurement.needInspection} />
+                             <InfoItem label="是否原箱发货" value={formData.procurement.isOriginalBox} />
+                          </div>
                        </div>
                     </div>
                  </div>
-                 {/* 规格展示/编辑 */}
-                 <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100">
-                    <SubTitle title="规格与装箱" en="Specs & Packing" color="orange" />
-                    {isEditing ? (
-                       <div className="grid grid-cols-2 gap-8 mt-4">
-                          <DimensionInput label="单品规格" value={formData.specs.itemDim} onChange={(v) => updateField('specs.itemDim', v)} />
-                          <DimensionInput label="包装规格" value={formData.specs.packageDim} onChange={(v) => updateField('specs.packageDim', v)} />
-                          <WeightInputRow label="净重" value={formData.specs.netWeight} onChange={(v) => updateField('specs.netWeight', v)} />
-                          <WeightInputRow label="毛重" value={formData.specs.grossWeight} onChange={(v) => updateField('specs.grossWeight', v)} />
+
+                 {/* 卡片 3: 首单追踪 与 规格参数 (垂直分层大卡片) */}
+                 <div className="bg-slate-50/30 p-5 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+                    <div>
+                       <SubTitle title="首单追踪" en="Timeline" color="orange" />
+                       <div className="grid grid-cols-4 gap-x-6 gap-y-1">
+                          <InfoItem label="首单日期" value={formData.procurement.firstOrderDate} />
+                          <InfoItem label="首单预估交期" value={formData.procurement.firstOrderEstDelivery} />
+                          <InfoItem label="首单实际交期" value={formData.procurement.firstOrderActDelivery} />
                        </div>
-                    ) : (
-                       <div className="grid grid-cols-4 gap-4 mt-2">
-                          <InfoItem label="单品规格" value={`${formData.specs.itemDim.l}*${formData.specs.itemDim.w}*${formData.specs.itemDim.h} cm`} span={2} />
-                          <InfoItem label="包装规格" value={`${formData.specs.packageDim.l}*${formData.specs.packageDim.w}*${formData.specs.packageDim.h} cm`} span={2} />
-                          <InfoItem label="净重" value={`${formData.specs.netWeight.value} ${formData.specs.netWeight.unit}`} />
-                          <InfoItem label="毛重" value={`${formData.specs.grossWeight.value} ${formData.specs.grossWeight.unit}`} />
-                       </div>
-                    )}
+                    </div>
+                    <div className="pt-4 border-t border-slate-100/60">
+                       <SubTitle title="规格参数" en="Specifications" color="blue" />
+                       {isEditing ? (
+                          <div className="grid grid-cols-2 gap-8 mt-2">
+                             <DimensionInput label="单品规格" value={formData.specs.itemDim} onChange={(v) => updateField('specs.itemDim', v)} />
+                             <DimensionInput label="包装规格" value={formData.specs.packageDim} onChange={(v) => updateField('specs.packageDim', v)} />
+                             <WeightInputRow label="净重" value={formData.specs.netWeight} onChange={(v) => updateField('specs.netWeight', v)} />
+                             <WeightInputRow label="毛重" value={formData.specs.grossWeight} onChange={(v) => updateField('specs.grossWeight', v)} />
+                          </div>
+                       ) : (
+                          <div className="grid grid-cols-2 gap-x-8 gap-y-1">
+                             <div className="grid grid-cols-1 gap-y-1">
+                                <InfoItem label="单品规格" value={`${formData.specs.itemDim.l}*${formData.specs.itemDim.w}*${formData.specs.itemDim.h} cm`} />
+                                <InfoItem label="净重" value={`${formData.specs.netWeight.value} ${formData.specs.netWeight.unit}`} />
+                             </div>
+                             <div className="grid grid-cols-1 gap-y-1">
+                                <InfoItem label="包装规格" value={`${formData.specs.packageDim.l}*${formData.specs.packageDim.w}*${formData.specs.packageDim.h} cm`} />
+                                <InfoItem label="毛重" value={`${formData.specs.grossWeight.value} ${formData.specs.grossWeight.unit}`} />
+                             </div>
+                          </div>
+                       )}
+                    </div>
                  </div>
+
+                 {/* 图片展示 */}
                  <div className="grid grid-cols-2 gap-6">
-                    <div><SubTitle title="产品图片" en="Product Images" color="blue" /><div className="bg-slate-50/30 p-3 rounded-lg border border-slate-100">{isEditing ? <ImageUploader images={formData.specs.images} onUpload={(imgs) => updateField('specs.images', imgs)} /> : <div className="flex gap-2">{[1,2].map(i=><div key={i} className="w-12 h-12 bg-white border rounded flex items-center justify-center text-slate-300 shadow-sm"><Package size={20}/></div>)}</div>}</div></div>
-                    <div><SubTitle title="包装图片" en="Packaging Images" color="orange" /><div className="bg-slate-50/30 p-3 rounded-lg border border-slate-100"><div className="flex gap-2">{[1].map(i=><div key={i} className="w-12 h-12 bg-white border rounded flex items-center justify-center text-slate-300 shadow-sm"><Box size={20}/></div>)}</div></div></div>
+                    <div><SubTitle title="产品图片" en="Product Images" color="blue" /><div className="bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">{isEditing ? <ImageUploader images={formData.specs.images} onUpload={(imgs) => updateField('specs.images', imgs)} /> : <div className="flex gap-2">{[1,2].map(i=><div key={i} className="w-12 h-12 bg-white border rounded flex items-center justify-center text-slate-300 shadow-sm"><Package size={20}/></div>)}</div>}</div></div>
+                    <div><SubTitle title="包装图片" en="Packaging Images" color="orange" /><div className="bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm"><div className="flex gap-2">{[1].map(i=><div key={i} className="w-12 h-12 bg-white border rounded flex items-center justify-center text-slate-300 shadow-sm"><Box size={20}/></div>)}</div></div></div>
                  </div>
               </div>
             </div>
