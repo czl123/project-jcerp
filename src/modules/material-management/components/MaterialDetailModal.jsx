@@ -76,6 +76,10 @@ const MaterialDetailModal = ({ material, onClose }) => {
       customsMaterial: '塑料' 
     },
     specs: { itemDim: { l: '16', w: '8', h: '1' }, packageDim: { l: '20', w: '10', h: '2' }, netWeight: { value: '0.05', unit: 'kg' }, grossWeight: { value: '0.08', unit: 'kg' }, images: [] },
+    asinList: [
+      { id: 1, account: "MoKo-US", site: "US", asin: "B0CB6X6XXX", ver: "V1.0", op: "张运营", listing: "李编写" },
+      { id: 2, account: "MoKo-DE", site: "DE", asin: "B0CBZZZYYY", ver: "V1.1", op: "王运营", listing: "赵编写" }
+    ],
     responsibles: {
       dev: { leader: '张团队', pm: '李经理', initialPm: '王初始' },
       procurement: { frontend: '赵前端', backend: '钱后端', initial: '孙初始' },
@@ -610,19 +614,41 @@ const MaterialDetailModal = ({ material, onClose }) => {
                   <Tag size={16} className="text-blue-500" /><span>ASIN 信息</span>
                </div>
                <div className="mx-2 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                  <table className="w-full text-left text-[11px]">
+                  <table className="w-full text-left text-[11px] border-collapse">
                      <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                        <tr><th className="px-4 py-2.5 font-bold text-center w-12">序号</th><th className="px-4 py-2.5 font-bold">销售账号</th><th className="px-4 py-2.5 font-bold w-20">站点</th><th className="px-4 py-2.5 font-bold">ASIN</th><th className="px-4 py-2.5 font-bold w-20">版本</th><th className="px-4 py-2.5 font-bold text-center">负责人</th></tr>
+                        <tr>
+                           <th className="px-4 py-2.5 font-bold text-center w-12">序号</th>
+                           <th className="px-4 py-2.5 font-bold">销售账号</th>
+                           <th className="px-4 py-2.5 font-bold w-20 text-center">站点</th>
+                           <th className="px-4 py-2.5 font-bold">ASIN</th>
+                           <th className="px-4 py-2.5 font-bold w-24 text-center">版本</th>
+                           <th className="px-4 py-2.5 font-bold text-center">运营人员</th>
+                           <th className="px-4 py-2.5 font-bold text-center">Listing人员</th>
+                        </tr>
                      </thead>
-                     <tbody className="divide-y divide-slate-50">
-                        {[{ account: "MoKo-US", site: "US", asin: "B0CB6X6XXX", ver: "V1.0", p: "张三" }].map((row, idx) => (
+                     <tbody className="divide-y divide-slate-100">
+                        {formData.asinList.map((row, idx) => (
                            <tr key={idx} className="hover:bg-blue-50/30 transition-colors group">
                               <td className="px-4 py-2 text-center text-slate-400 font-mono">{idx + 1}</td>
                               <td className="px-4 py-2 font-bold text-slate-700">{row.account}</td>
-                              <td className="px-4 py-2"><span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold">{row.site}</span></td>
-                              <td className="px-4 py-2 font-mono text-blue-600 font-medium hover:underline cursor-pointer flex items-center gap-1">{row.asin} <button onClick={() => handleCopy(row.asin, `asin-${idx}`)} className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-blue-500">{copyFeedback === `asin-${idx}` ? <Check size={10} className="text-emerald-500" /> : <Copy size={10} />}</button></td>
-                              <td className="px-4 py-2 text-slate-500">{row.ver}</td>
-                              <td className="px-4 py-2 text-center text-slate-600">{row.p}</td>
+                              <td className="px-4 py-2 text-center">
+                                 <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-black uppercase">{row.site}</span>
+                              </td>
+                              <td className="px-4 py-2 font-mono text-blue-600 font-medium">
+                                 <div className="flex items-center gap-2">
+                                    <span className="hover:underline cursor-pointer">{row.asin}</span>
+                                    <button onClick={() => handleCopy(row.asin, `asin-${idx}`)} className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-blue-500 transition-all">
+                                       {copyFeedback === `asin-${idx}` ? <Check size={10} className="text-emerald-500" /> : <Copy size={10} />}
+                                    </button>
+                                 </div>
+                              </td>
+                              <td className="px-4 py-2 text-center text-slate-500 font-medium">{row.ver}</td>
+                              <td className="px-4 py-2 text-center">
+                                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md font-bold border border-blue-100/50">{row.op}</span>
+                              </td>
+                              <td className="px-4 py-2 text-center">
+                                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md font-bold border border-emerald-100/50">{row.listing}</span>
+                              </td>
                            </tr>
                         ))}
                      </tbody>
