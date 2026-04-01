@@ -261,17 +261,16 @@ const MaterialDetailModal = ({ material, onClose }) => {
                
                <div className="flex items-center gap-2.5">
                   {/* 状态标签组 - 统一药丸风格 */}
-                  <span className="flex items-center h-6 px-3 rounded-full bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-500/20 text-[10px] font-bold shadow-sm">
-                     <div className="w-1 h-1 rounded-full bg-blue-500 mr-1.5 animate-pulse"></div>
+                  <span title="物料状态" className="flex items-center h-6 px-3 rounded-full bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-500/20 text-[10px] font-bold shadow-sm">
                      {formData.status}
                   </span>
-                  <span className="flex items-center h-6 px-3 rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-500/20 text-[10px] font-bold shadow-sm">
+                  <span title="同步状态" className="flex items-center h-6 px-3 rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-500/20 text-[10px] font-bold shadow-sm">
                      {formData.syncStatus}
                   </span>
-                  <span className="flex items-center h-6 px-3 rounded-full bg-purple-50 text-purple-600 ring-1 ring-inset ring-purple-500/20 text-[10px] font-bold shadow-sm">
+                  <span title="物料版本" className="flex items-center h-6 px-3 rounded-full bg-purple-50 text-purple-600 ring-1 ring-inset ring-purple-500/20 text-[10px] font-bold shadow-sm">
                      {formData.version}
                   </span>
-                  <span className="flex items-center h-6 px-3 rounded-full bg-orange-50 text-orange-600 ring-1 ring-inset ring-orange-500/20 text-[10px] font-bold shadow-sm">
+                  <span title="营销等级" className="flex items-center h-6 px-3 rounded-full bg-orange-50 text-orange-600 ring-1 ring-inset ring-orange-500/20 text-[10px] font-bold shadow-sm">
                      {formData.marketingLevel}
                   </span>
                </div>
