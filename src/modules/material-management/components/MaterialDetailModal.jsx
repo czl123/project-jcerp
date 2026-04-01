@@ -147,7 +147,6 @@ const MaterialDetailModal = ({ material, onClose }) => {
             </h2>
           </div>
           <div className="flex items-center gap-4">
-             {!isEditing && <button className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 text-slate-500 rounded border border-slate-200 text-[11px] hover:bg-slate-100 transition-all font-bold"><History size={12} /> 查看历史版本</button>}
              <button onClick={onClose} className="p-1 hover:bg-slate-50 rounded-md"><X size={18} className="text-slate-400" /></button>
           </div>
         </div>
