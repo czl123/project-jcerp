@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MAIN_MENUS } from './menuConfig'; // 確保數據結構完整
+import { Sun, Moon } from 'lucide-react';
+import { MAIN_MENUS } from './menuConfig'; 
+import { useAppContext } from './store/context';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDarkMode, toggleDarkMode } = useAppContext();
   
   // 狀態管理
   const [activeMain, setActiveMain] = useState('product'); // 預設選中產品
@@ -46,7 +49,7 @@ const Sidebar = () => {
     <div className="flex h-full shrink-0 relative" ref={panelRef}>
       
       {/* --- 第一層：窄條主菜單 (深色) --- */}
-      <div className="w-[64px] bg-[#001529] flex flex-col items-center py-3 z-[100] border-r border-white/5 shrink-0">
+      <div className="w-[64px] bg-[#001529] dark:bg-black flex flex-col items-center py-3 z-[100] border-r border-white/5 shrink-0 transition-colors duration-300">
         {/* Logo */}
         <div className="h-12 flex items-center justify-center mb-1">
           <div className="w-8 h-8 bg-blue-600 rounded-sm flex items-center justify-center text-white font-bold text-[10px] shadow-lg shadow-blue-500/20">
@@ -75,7 +78,7 @@ const Sidebar = () => {
                 
                 {/* 2. ✨關鍵優化：選中且面板展開時，顯示右側對接的小三角 ✨ */}
                 {isActive && showPanel && (
-                  <div className="absolute -right-[1px] top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-white z-[110] animate-in fade-in duration-300"></div>
+                  <div className="absolute -right-[1px] top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-white dark:border-r-gray-800 z-[110] animate-in fade-in duration-300"></div>
                 )}
                 
                 <div className="group-hover:scale-105 transition-transform">
@@ -88,17 +91,31 @@ const Sidebar = () => {
             );
           })}
         </div>
+
+        {/* --- 暗黑模式切換 --- */}
+        <div 
+          onClick={() => {
+            console.log('Dark mode button clicked! Current mode:', isDarkMode);
+            toggleDarkMode();
+          }}
+          className="w-full flex flex-col items-center py-4 cursor-pointer text-gray-400 hover:text-white hover:bg-white/5 transition-all mt-auto border-t border-white/10"
+        >
+          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          <span className="text-[10px] mt-1 opacity-60">
+            {isDarkMode ? '日間' : '夜間'}
+          </span>
+        </div>
       </div>
 
       {/* --- 第二層：彈出式面板 (一體化優化版) --- */}
       {showPanel && activeMain === 'product' && (
-        <div className="absolute left-[64px] top-0 h-full bg-white z-[90] border-r border-gray-100 flex animate-in slide-in-from-left-1 duration-200 w-[420px] shadow-[15px_0_30px_-5px_rgba(0,0,0,0.08)]">
+        <div className="absolute left-[64px] top-0 h-full bg-white dark:bg-gray-800 z-[90] border-r border-gray-100 dark:border-gray-700 flex animate-in slide-in-from-left-1 duration-200 w-[420px] shadow-[15px_0_30px_-5px_rgba(0,0,0,0.08)]">
           <div className="flex-1 flex flex-col h-full overflow-y-auto p-7 no-scrollbar">
             
             {/* 面板標題 (優化排版) */}
-            <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-100">
+            <div className="flex items-center justify-between mb-8 pb-3 border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-baseline space-x-2">
-                <span className="text-lg font-extrabold text-gray-900 tracking-tight">產品中心</span>
+                <span className="text-lg font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">產品中心</span>
                 <span className="text-[10px] text-gray-400 font-mono tracking-wider">PRODUCT</span>
               </div>
               <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
@@ -112,7 +129,7 @@ const Sidebar = () => {
                   className="flex flex-col space-y-3.5 break-inside-avoid mb-9" // 確保分組不被截斷
                 >
                   {/* 二級分组名 (改用背景色塊代替豎線，更整潔) */}
-                  <div className="bg-gray-50 text-gray-500 text-[11px] font-bold tracking-widest px-2.5 py-1 rounded-sm uppercase inline-block self-start">
+                  <div className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-[11px] font-bold tracking-widest px-2.5 py-1 rounded-sm uppercase inline-block self-start">
                     {group.title}
                   </div>
                   
@@ -126,8 +143,8 @@ const Sidebar = () => {
                           onClick={() => handleSubItemClick(item.path)}
                           className={`text-[13px] py-1.5 px-3 rounded cursor-pointer transition-all relative flex items-center group
                             ${isCurrent 
-                              ? 'text-blue-600 bg-blue-50/70 font-bold' 
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              ? 'text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-900/30 font-bold' 
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
                             }`}
                         >
                           {/* 選中時的三級菜單左側小圓點 */}

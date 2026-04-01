@@ -1,14 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom' // 👈 引入路由器
+import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
+import { AppProvider } from './store/context.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* 👈 用 BrowserRouter 包裹整个 App */}
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <AppProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AppProvider>
   </React.StrictMode>,
 )

@@ -8,16 +8,36 @@ export const AppProvider = ({ children }) => {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // 暗黑模式状态
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
+
+  // 切换暗黑模式
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
+  // 监听模式变化并更新 DOM 和 localStorage
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark'); // 增加对 body 的同步
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark'); // 增加对 body 的同步
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // 获取物料数据
   const fetchMaterials = async () => {
     setLoading(true);
     setError(null);
     try {
-      // 这里应该是实际的 API 调用
-      // const data = await MaterialService.getMaterials();
-      // setMaterials(data);
-
       // 模拟数据
       const mockData = [
         { id: 1, spu: "TC1837", code: "TC260588", prop: "S20190053-220712", cat: "平板电脑保...", name: "平板皮套", style: "电压款-三折...", material: "TPU", brand: "苹果", model: "iPad 10th 2" },
@@ -42,6 +62,8 @@ export const AppProvider = ({ children }) => {
     loading,
     error,
     fetchMaterials,
+    isDarkMode,
+    toggleDarkMode,
   };
 
   return (
