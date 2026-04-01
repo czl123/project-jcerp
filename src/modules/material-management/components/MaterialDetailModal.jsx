@@ -75,7 +75,13 @@ const MaterialDetailModal = ({ material, onClose }) => {
       invoiceSpec: 'BK-001', 
       customsMaterial: '塑料' 
     },
-    specs: { itemDim: { l: '16', w: '8', h: '1' }, packageDim: { l: '20', w: '10', h: '2' }, netWeight: { value: '0.05', unit: 'kg' }, grossWeight: { value: '0.08', unit: 'kg' }, images: [] }
+    specs: { itemDim: { l: '16', w: '8', h: '1' }, packageDim: { l: '20', w: '10', h: '2' }, netWeight: { value: '0.05', unit: 'kg' }, grossWeight: { value: '0.08', unit: 'kg' }, images: [] },
+    responsibles: {
+      dev: { leader: '张团队', pm: '李经理', initialPm: '王初始' },
+      procurement: { frontend: '赵前端', backend: '钱后端', initial: '孙初始' },
+      ops: { staff: '周运营', initial: '吴初始' },
+      others: { pmc: '郑PMC', warehouse: '王仓储' }
+    }
   });
 
   const sectionRefs = { '基本信息': useRef(null), '采购信息': useRef(null), '卖点设计信息': useRef(null), '负责人信息': useRef(null), 'ASIN信息': useRef(null), '包裹信息': useRef(null), '配件信息': useRef(null), '操作日志': useRef(null) };
@@ -554,16 +560,46 @@ const MaterialDetailModal = ({ material, onClose }) => {
                 <User size={16} className="text-blue-500" /><span>负责人信息</span>
               </div>
               <div className="space-y-6 px-2">
-                 <SubTitle title="干系人分配" en="Stakeholders" color="purple" />
-                 <div className="grid grid-cols-4 gap-6 bg-slate-50/30 p-4 rounded-xl border border-slate-100 shadow-sm items-start">
-                    {['开发', '采购', '运营', '其他'].map(role => (
-                       <div key={role} className="space-y-3">
-                          <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter flex items-center gap-1.5 border-b border-slate-200 pb-1.5"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> {role}负责人</div>
-                          <div className="space-y-2">
-                             {[1].map(u => (<div key={u} className="flex items-center gap-2 bg-white/60 p-1.5 rounded-lg border border-white shadow-sm hover:bg-white transition-colors"><div className="w-6 h-6 rounded bg-slate-50 text-slate-400 flex items-center justify-center font-black text-[10px] uppercase">人</div><div className="flex-1 min-w-0"><div className="text-[11px] font-bold text-slate-700 truncate">负责人名</div><div className="text-[9px] text-slate-400 truncate scale-90 origin-left">所属部门</div></div></div>))}
-                          </div>
+                 <div className="grid grid-cols-4 gap-6 items-start">
+                    
+                    {/* 开发负责人 */}
+                    <div className="bg-slate-50/30 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                       <SubTitle title="开发负责人" en="Dev" color="blue" />
+                       <div className="space-y-1">
+                          <InfoItem label="产品团队负责人" value={formData.responsibles.dev.leader} fieldPath="responsibles.dev.leader" />
+                          <InfoItem label="产品经理" value={formData.responsibles.dev.pm} fieldPath="responsibles.dev.pm" />
+                          <InfoItem label="初始产品经理" value={formData.responsibles.dev.initialPm} fieldPath="responsibles.dev.initialPm" />
                        </div>
-                    ))}
+                    </div>
+
+                    {/* 采购负责人 */}
+                    <div className="bg-slate-50/30 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                       <SubTitle title="采购负责人" en="Procurement" color="orange" />
+                       <div className="space-y-1">
+                          <InfoItem label="前端采购人员" value={formData.responsibles.procurement.frontend} fieldPath="responsibles.procurement.frontend" />
+                          <InfoItem label="后端采购人员" value={formData.responsibles.procurement.backend} fieldPath="responsibles.procurement.backend" />
+                          <InfoItem label="初始采购人员" value={formData.responsibles.procurement.initial} fieldPath="responsibles.procurement.initial" />
+                       </div>
+                    </div>
+
+                    {/* 运营负责人 */}
+                    <div className="bg-slate-50/30 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                       <SubTitle title="运营负责人" en="Ops" color="green" />
+                       <div className="space-y-1">
+                          <InfoItem label="运营人员" value={formData.responsibles.ops.staff} fieldPath="responsibles.ops.staff" />
+                          <InfoItem label="初始运营人员" value={formData.responsibles.ops.initial} fieldPath="responsibles.ops.initial" />
+                       </div>
+                    </div>
+
+                    {/* 其他 */}
+                    <div className="bg-slate-50/30 p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                       <SubTitle title="其他支持" en="Others" color="purple" />
+                       <div className="space-y-1">
+                          <InfoItem label="PMC人员" value={formData.responsibles.others.pmc} fieldPath="responsibles.others.pmc" />
+                          <InfoItem label="仓储人员" value={formData.responsibles.others.warehouse} fieldPath="responsibles.others.warehouse" />
+                       </div>
+                    </div>
+
                  </div>
               </div>
             </div>
