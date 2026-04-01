@@ -84,6 +84,11 @@ const MaterialDetailModal = ({ material, onClose }) => {
       { id: 1, name: "标准外箱-A", l: "50.0", w: "40.0", h: "30.0", weight: "12.50", index: "PKG-001" },
       { id: 2, name: "标准外箱-B", l: "45.0", w: "35.0", h: "25.0", weight: "10.20", index: "PKG-002" }
     ],
+    accessories: [
+      { id: 1, name: "数据线", sku: "ACC-001-C" },
+      { id: 2, name: "充电头", sku: "ACC-002-W" },
+      { id: 3, name: "说明书", sku: "ACC-003-M" }
+    ],
     responsibles: {
       dev: { leader: '张团队', pm: '李经理', initialPm: '王初始' },
       procurement: { frontend: '赵前端', backend: '钱后端', initial: '孙初始' },
@@ -691,6 +696,38 @@ const MaterialDetailModal = ({ material, onClose }) => {
                               <td className="px-4 py-2 text-center font-mono text-slate-600">{pkg.w}</td>
                               <td className="px-4 py-2 text-center font-mono text-slate-600">{pkg.h}</td>
                               <td className="px-4 py-2 text-center font-mono text-blue-600 font-bold">{pkg.weight}</td>
+                           </tr>
+                        ))}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+
+            {/* 7. 配件信息 */}
+            <div ref={sectionRefs['配件信息']} className="space-y-4 scroll-mt-10">
+               <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm pb-2 border-b border-slate-100 flex items-center justify-between text-slate-800 font-bold text-[14px]">
+                  <div className="flex items-center space-x-2">
+                     <Link2 size={16} className="text-blue-500" /><span>配件信息</span>
+                  </div>
+                  <div className="pr-4 text-[10px] text-slate-400 font-normal">
+                     共计 <span className="font-bold text-blue-600">{formData.accessories.length}</span> 个配件项
+                  </div>
+               </div>
+               <div className="mx-2 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                  <table className="w-full text-left text-[11px] border-collapse">
+                     <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                        <tr>
+                           <th className="px-4 py-2.5 font-bold text-center w-24">序号</th>
+                           <th className="px-4 py-2.5 font-bold">配件名称</th>
+                           <th className="px-4 py-2.5 font-bold">配件SKU</th>
+                        </tr>
+                     </thead>
+                     <tbody className="divide-y divide-slate-100">
+                        {formData.accessories.map((acc, idx) => (
+                           <tr key={idx} className="hover:bg-blue-50/30 transition-colors group">
+                              <td className="px-4 py-2 text-center text-slate-500 font-mono font-bold">{idx + 1}</td>
+                              <td className="px-4 py-2 font-black text-slate-700">{acc.name}</td>
+                              <td className="px-4 py-2 font-mono text-blue-600 font-bold">{acc.sku}</td>
                            </tr>
                         ))}
                      </tbody>
