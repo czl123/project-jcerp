@@ -1,0 +1,25 @@
+{
+  "auth": {
+    "enabled": true,
+    "method": "jwt",
+    "secret": "your-secret-key-here",
+    "expiresIn": "24h",
+    "refreshExpiresIn": "7d"
+  },
+  "users": {
+    "admin": {
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin"
+    },
+    "user": {
+      "username": "user",
+      "password": "user123",
+      "role": "user"
+    }
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "./database/auth.db"
+  }
+}

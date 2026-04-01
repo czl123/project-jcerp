@@ -1,0 +1,459 @@
+import React, { useState } from 'react';
+import { 
+  Search, RotateCcw, Download, Calendar, Settings, ChevronDown, ChevronRight, Plus, HelpCircle
+} from 'lucide-react';
+// ✨ 引入 ECharts
+import ReactECharts from 'echarts-for-react';
+import ProductDetailModal from './ProductInformationSupplement';
+
+const ProposalManagement = () => {
+  // 管理已展开行的 ID 集合
+  const [expandedRowKeys, setExpandedRowKeys] = useState(new Set());
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
+  const toggleRow = (id) => {
+    setExpandedRowKeys(prevKeys => {
+      const nextKeys = new Set(prevKeys);
+      if (nextKeys.has(id)) nextKeys.delete(id);
+      else nextKeys.add(id);
+      return nextKeys;
+    });
+  };
+
+  // 顶部待办状态数据
+  const todoStats = [
+    { label: '待设计', count: 3, color: 'sky' }, { label: '任务待发', count: 0, color: 'slate' }, { label: '定稿反馈', count: 1, color: 'emerald' },
+    { label: '样品反馈', count: 5, color: 'amber' }, { label: '样品寄送', count: 0, color: 'slate' }, { label: '信息补充', count: 0, color: 'slate' },
+    { label: '首单需求待采购', count: 2, color: 'rose' }, { label: '首单需求待询价', count: 0, color: 'slate' }, { label: '首单需求待确认', count: 0, color: 'slate' },
+    { label: '定品待审', count: 0, color: 'slate' }, { label: '定品待市场', count: 1, color: 'violet' }, { label: '定品一级审批', count: 0, color: 'slate' },
+    { label: '定品二级审批', count: 0, color: 'slate' }
+  ];
+
+  // 模拟表格数据
+  const mockData = [
+    { id: 1, no: 'TA-202603151', source: '需求提案', date: '2026-03-27', status: '待设计', statusCode: 'pending', spu: 'SW1126', platform: 'Amazon', category: '智能手表', name: '手表充电器', style: '圆盘充电底座', material: 'ABS', brand: '佳明', model: 'Fenix 8', pm: '白雪', devMode: '派生品-拓新', grade: 'D', reqTime: '2026-04', infringe: '-' },
+    { id: 2, no: 'TA-202603150', source: '需求提案', date: '2026-03-27', status: '拿样中', statusCode: 'sampling', hasAlert: true, spu: 'SW1367', platform: 'Amazon', category: '智能手表', name: '手表表带', style: '回环编织...', material: '尼龙', brand: 'Hume', model: 'Health...', pm: '白雪', devMode: '全新品-定制', grade: 'D', reqTime: '2026-04', infringe: '-' },
+    { id: 3, no: 'TA-202603149', source: '推样提案', date: '2026-03-27', status: '拿样中', statusCode: 'sampling', spu: 'SW1366', platform: 'Amazon', category: '智能手表', name: '手表表带', style: '光面硅胶型...', material: '硅胶', brand: '华为', model: 'Band 11', pm: '白雪', devMode: '全新品-现货', grade: 'D', reqTime: '-', infringe: '-' },
+    { id: 4, no: 'TA-202603148', source: '开发提案', date: '2026-03-27', status: '设计完成', statusCode: 'done', spu: 'IF0316', platform: 'Amazon', category: '室内家具', name: '梳妆桌', style: '轻奢木纹款', material: '刨花板+碳钢', brand: '-', model: '-', pm: '亚慕凡', devMode: '全新品-定制', grade: 'S', reqTime: '-', infringe: '否' },
+  ];
+
+  return (
+    <div className="flex flex-col h-full bg-slate-50 overflow-hidden text-[12px] text-slate-800 antialiased font-sans">
+      
+      {/* 待办状态横幅 */}
+      <div className="bg-white px-4 py-2 flex items-center space-x-2.5 overflow-x-auto no-scrollbar shrink-0 shadow-sm z-10 border-b border-slate-100">
+        <span className="text-slate-500 font-semibold whitespace-nowrap mr-1 tracking-tight">待处理提案 :</span>
+        {todoStats.map((item, idx) => {
+          const isActive = item.count > 0;
+          return (
+            <div key={idx} className={`flex items-center border rounded-full px-3.5 py-1.5 cursor-pointer transition-all duration-150 whitespace-nowrap shadow-sm hover:shadow-md ${isActive ? `bg-${item.color}-50 border-${item.color}-100 hover:border-${item.color}-200` : 'bg-white border-slate-200 hover:border-slate-300'}`}>
+              <span className={isActive ? `text-${item.color}-700 font-medium` : 'text-slate-600'}>{item.label}</span>
+              <span className={`ml-1.5 font-mono text-[11px] ${isActive ? `text-${item.color}-600` : 'text-slate-400'}`}>({item.count})</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <main className="flex-1 flex flex-col overflow-hidden">
+        
+        {/* 筛选区域 */}
+        <div className="bg-white m-3 mb-0 p-4 rounded-t-lg border border-slate-100 shadow-slate-200/50 shadow-md space-y-4 shrink-0">
+          <div className="flex items-center flex-wrap gap-x-3 gap-y-2.5">
+            <FilterSelect label="立项日期" icon={<Calendar size={13} className="text-slate-400"/>} placeholder="开始时间 至 结束时间" w="w-56" />
+            <FilterSelect placeholder="平台" />
+            <FilterSelect placeholder="运营大类" />
+            <FilterSelect placeholder="产品经理" />
+            <FilterSelect placeholder="当前进度" />
+            <FilterSelect placeholder="开发方式" />
+            <FilterSelect placeholder="提案等级" />
+            <FilterSelect placeholder="新品开发进度" />
+            
+            <div className="flex items-center border border-slate-200 rounded h-[30px] overflow-hidden bg-white focus-within:border-sky-400 focus-within:shadow-inner transition-all">
+              <span className="bg-slate-50 px-2 text-slate-500 border-r border-slate-200 flex items-center h-full cursor-pointer hover:bg-slate-100 transition-colors">
+                提案编号 <ChevronDown size={12} className="ml-1"/>
+              </span>
+              <input className="px-3 w-36 outline-none text-[11px] placeholder:text-slate-300" placeholder="请输入内容" />
+              <div className="px-2.5 cursor-pointer hover:bg-slate-100 flex items-center h-full border-l border-slate-100 transition-colors"><Search size={13} className="text-slate-400" /></div>
+            </div>
+            
+            <button className="border border-slate-200 h-[30px] px-3.5 rounded text-slate-600 flex items-center space-x-1.5 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition-all shadow-sm">
+              <RotateCcw size={13} className="text-slate-400" /><span>重置</span>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-dashed border-slate-200 pt-3.5">
+            <button className="bg-sky-600 text-white px-4 h-[30px] rounded flex items-center hover:bg-sky-700 shadow-md transition-colors font-medium">
+              创建提案
+            </button>
+            <div className="flex items-center space-x-3.5 text-slate-400">
+              <RotateCcw size={15} className="cursor-pointer hover:text-sky-600 transition-colors" />
+              <Download size={15} className="cursor-pointer hover:text-sky-600 transition-colors" />
+              <Settings size={15} className="cursor-pointer hover:text-sky-600 transition-colors" />
+            </div>
+          </div>
+        </div>
+
+        {/* 表格区域 */}
+        <div className="bg-white mx-3 flex-1 border border-t-0 border-slate-100 rounded-b-lg shadow-slate-200/50 shadow-md overflow-hidden flex flex-col relative z-0">
+          <div className="flex-1 overflow-auto">
+            <table className="w-full text-left border-collapse min-w-[1900px] relative z-0">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 text-[11px] sticky top-0 z-20 shadow-slate-100 shadow-inner">
+                <tr>
+                  <th className="p-3 w-10 border-r border-slate-100 text-center"><input type="checkbox" /></th>
+                  <th className="p-3 w-10 text-center border-r border-slate-100 font-semibold">#</th>
+                  <th className="p-3 w-8 text-center border-r border-slate-100"></th>
+                  <th className="p-3 w-32 border-r border-slate-100 font-semibold tracking-tight">提案编号</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold">提案来源</th>
+                  <th className="p-3 w-28 border-r border-slate-100 font-semibold flex items-center justify-between">立项日期 <ChevronDown size={12}/></th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold text-center">当前进度</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold text-sky-600">SPU</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold">平台</th>
+                  <th className="p-3 w-32 border-r border-slate-100 font-semibold">运营大类</th>
+                  <th className="p-3 w-32 border-r border-slate-100 font-semibold">产品名称</th>
+                  <th className="p-3 w-32 border-r border-slate-100 font-semibold">款式</th>
+                  <th className="p-3 w-20 border-r border-slate-100 font-semibold">主材料</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold">适用品牌或对象</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold">型号</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold">产品经理</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold">开发方式</th>
+                  <th className="p-3 w-20 border-r border-slate-100 font-semibold text-center">提案等级</th>
+                  <th className="p-3 w-28 border-r border-slate-100 font-semibold">上架时间要求</th>
+                  <th className="p-3 w-24 border-r border-slate-100 font-semibold text-center">是否预调研</th>
+                  <th className="p-3 w-[120px] text-center font-semibold text-slate-700 sticky right-0 bg-slate-50 z-30 shadow-[-4px_0_6px_-2px_rgba(15,23,42,0.04)] before:absolute before:content-[''] before:left-0 before:top-0 before:h-full before:w-[1px] before:bg-slate-200">
+                    操作
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="text-[11px] text-slate-700 relative z-0">
+                {mockData.map((row, index) => {
+                  const isExpanded = expandedRowKeys.has(row.id);
+                  
+                  return (
+                    <React.Fragment key={row.id}>
+                      {/* --- 主数据行 --- */}
+                      <tr className={`border-slate-100 hover:bg-slate-50 transition-colors relative group/row ${isExpanded ? 'bg-slate-50/80 border-0' : 'border-b hover:bg-slate-50/50'}`}>
+                        <td className="p-2.5 border-r border-slate-100 text-center"><input type="checkbox" /></td>
+                        <td className="p-2.5 border-r border-slate-100 text-center text-slate-400">{index + 1}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-center" onClick={() => toggleRow(row.id)}>
+                          <div className={`w-4 h-4 mx-auto flex items-center justify-center border rounded-sm transition-all duration-200 cursor-pointer hover:border-sky-400 ${isExpanded ? 'border-sky-400 text-sky-500' : 'border-slate-300 text-slate-400 hover:text-sky-500'}`}>
+                            <ChevronRight size={12} className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                          </div>
+                        </td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-600 font-mono tracking-tight font-medium">{row.no}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-sky-600 font-medium hover:underline cursor-pointer">{row.source}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.date}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-center relative">
+                          <div className="inline-block relative">
+                            <StatusTag status={row.statusCode} label={row.status} />
+                            {row.hasAlert && <span className="absolute -top-1.5 -right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white shadow-sm shadow-red-200"></span>}
+                          </div>
+                        </td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-600 cursor-pointer hover:underline">{row.spu}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.platform}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-600">{row.category}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-700">{row.name}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500 truncate">{row.style}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.material}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.brand}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.model}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-600">{row.pm}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.devMode}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-center font-medium">{row.grade}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-slate-500">{row.reqTime}</td>
+                        <td className="p-2.5 border-r border-slate-100 text-center text-slate-500">{row.infringe}</td>
+                        {/* ✨ 修复：增加 w-[120px] min-w-[120px] 锁死列宽，以及 whitespace-nowrap 严禁文字换行 */}
+                        {/* ✨ 修复：加上 group-hover/row:z-[60]，当鼠标移动到该行时，操作列层级跃升，绝不被下一行遮挡 */}
+                        {/* ✨ 修复：移除了不存在的 isSelected，保留 z-[60] 层级提升和宽度的修正 */}
+                        <td className="p-2.5 sticky right-0 z-10 group-hover/row:z-[60] transition-colors shadow-[-4px_0_6px_-2px_rgba(15,23,42,0.02)] before:absolute before:content-[''] before:left-0 before:top-0 before:h-full before:w-[1px] before:bg-slate-200 w-[120px] min-w-[120px] bg-white group-hover/row:bg-[#f8fbfd]">
+                        <div className="flex items-center justify-center space-x-1.5 text-[12px] whitespace-nowrap">
+                            <span className="text-sky-600 cursor-pointer hover:font-semibold transition-all">详情</span>
+                            <span className="text-slate-300 font-light pb-[2px]">|</span>
+                            <div className="relative group/dropdown cursor-pointer">
+                            <div className="flex items-center text-sky-600 hover:font-semibold transition-all">
+                                <span>操作</span>
+                                <ChevronDown size={12} className="ml-0.5 transition-transform duration-200 group-hover/dropdown:rotate-180" />
+                            </div>
+                            
+                            {/* ✨ 优化：宽度改为 w-[85px]，right 偏移改为 right-[-2px] 使其更贴合 */}
+                            <div className="absolute right-[-2px] top-full mt-1.5 w-[85px] bg-white rounded-lg shadow-xl shadow-slate-200/80 border border-slate-100 py-1 hidden group-hover/dropdown:block z-[999] animate-in fade-in slide-in-from-top-1">
+                            
+                            {/* 小三角位置也微调一下，确保居中 */}
+                            <div className="absolute -top-[5px] right-4 w-2.5 h-2.5 bg-white border-t border-l border-slate-100 rotate-45 z-0"></div>
+                            
+                            <div className="relative z-10 bg-white flex flex-col text-left text-[12px]">
+                                {/* ✨ 内边距 px-3 也会让整体显得更紧凑 */}
+                                <DropdownItem>编辑</DropdownItem>
+                                <DropdownItem>创建任务</DropdownItem>
+                                <DropdownItem>定品申请</DropdownItem>
+                                <DropdownItem>信息编辑</DropdownItem>
+                                <DropdownItem>归档</DropdownItem>
+                                <DropdownItem>转移</DropdownItem>
+                            </div>
+                            </div>
+                            
+                            </div>
+                        </div>
+                        </td>
+                      </tr>
+
+                      {/* --- 🎯 嵌套行：面板 (Dashboard Layout) --- */}
+                      {isExpanded && (
+                        <tr className="border-b border-slate-200 group/detail">
+                          <td colSpan={20} className="p-0 z-0 bg-white border-x border-sky-400">
+                            <DashboardDetail setIsProductModalOpen={setIsProductModalOpen}/>
+                          </td>
+                          {/* ✨ 修复：占位背景同样锁死 w-[120px] min-w-[120px] */}
+                          <td className="p-0 sticky right-0 bg-white z-10 shadow-[-4px_0_6px_-2px_rgba(15,23,42,0.02)] before:absolute before:content-[''] before:left-0 before:top-0 before:h-full before:w-[1px] before:bg-slate-200 w-[120px] min-w-[120px]"></td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="bg-white p-2.5 border-t border-slate-100 flex justify-end items-center space-x-2 text-[12px] text-slate-500 shrink-0 relative z-10">
+             <div className="flex items-center space-x-1.5 mr-5 relative">
+               <PagerBtn>&lt;</PagerBtn> <PagerBtn active>1</PagerBtn> <PagerBtn>2</PagerBtn> <PagerBtn>3</PagerBtn>
+               <span className="text-slate-300">...</span>
+               <PagerBtn>109</PagerBtn> <PagerBtn>&gt;</PagerBtn>
+             </div>
+             <div className="flex items-center border border-slate-200 rounded px-2.5 h-[26px] cursor-pointer hover:border-sky-400 hover:text-sky-600 transition-colors">
+               <span>20条/页</span><ChevronDown size={12} className="ml-1" />
+             </div>
+             <span className="text-slate-500">前往 <input className="w-9 h-[26px] border border-slate-200 rounded mx-1.5 text-center outline-none focus:border-sky-400 focus:shadow-inner" defaultValue="1" /> 页</span>
+             <span className="ml-2 font-medium text-slate-600">共 2175 条记录</span>
+          </div>
+        </div>
+      </main>
+      {/* ✨ 重点：加在这里！就在 main 标签结束之后，根 div 结束之前 ✨ */}
+      {isProductModalOpen && (
+        <ProductDetailModal onClose={() => setIsProductModalOpen(false)} />
+      )}
+    </div>
+  );
+};
+
+// --- ✨ 面板辅助组件 (加入真实的 ECharts) ---
+const DashboardDetail = ({ setIsProductModalOpen }) => {
+  return (
+    <div className="flex w-full px-8 py-6 gap-16 bg-white animate-in fade-in slide-in-from-top-2 duration-200 shadow-[inset_0_4px_6px_-4px_rgba(0,0,0,0.05)]">
+      
+      {/* 1. 统计 */}
+      <div className="w-[280px] shrink-0">
+        <h3 className="font-bold text-[14px] text-slate-800 mb-4 flex items-center">统计</h3>
+        <div className="flex flex-col space-y-3.5">
+          <StatItem label="任务发布" value={<>共 <span className="font-bold">【0/0/0】</span> 轮</>} hasIcon />
+          <StatItem label="开模次数" value={<>共 <span className="font-bold">【0】</span> 次</>} />
+          <StatItem label="定品申请" value={<>共 <span className="font-bold">【0】</span> 轮</>} />
+          <StatItem label="提案用时" value={<>共 <span className="font-bold">【<span className="text-red-500">0</span>(0)】</span> 天</>} hasIcon />
+          <StatItem label="样品数量" value={<>共 <span className="font-bold text-sky-600 cursor-pointer hover:underline">【0/0/0】</span> 件</>} hasIcon />
+          <StatItem label="研发投入" value={<>共 <span className="font-bold">【0】</span> 元</>} />
+        </div>
+      </div>
+
+      {/* 2. 待办 */}
+      <div className="w-[320px] shrink-0">
+        <h3 className="font-bold text-[14px] text-slate-800 mb-4">待办</h3>
+        <div className="grid grid-cols-2 gap-y-3.5 gap-x-8">
+          <TodoItem label="任务待发" value="0" isLink />
+          <TodoItem label="首单需求" value="待采集" isLink />
+          <TodoItem label="定制反馈" value="0" isLink />
+          <TodoItem label="定品待申" value="0" isLink />
+          <TodoItem label="样品反馈" value="0" isLink />
+          <div /> 
+          <TodoItem label="样品待还" value="0" isLink />
+          <div />
+          {/* ✨ 直接在这里传 onClick */}
+        <TodoItem 
+        label="信息补充" 
+        value="1" 
+        isLink 
+        onClick={() => {
+            console.log('点击了信息补充'); // 用于调试，看看控制台有没有打印
+            setIsProductModalOpen(true);
+        }} 
+        />
+        </div>
+      </div>
+
+      {/* 3. 协作 (真实 ECharts) */}
+      <div className="flex-1 flex flex-col min-w-[300px]">
+        {/* 头部与图例 */}
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-bold text-[14px] text-slate-800">协作</h3>
+          <div className="flex items-center space-x-4 text-[12px] text-slate-600">
+            <div className="flex items-center"><div className="w-4 h-3 bg-indigo-500 rounded-sm mr-1.5"></div>时长</div>
+            <div className="flex items-center"><div className="w-4 h-3 bg-[#73d13d] rounded-sm mr-1.5"></div>样品数</div>
+            <div className="flex items-center">
+              <div className="w-5 h-[2px] bg-amber-400 relative mr-1.5 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full border border-amber-400 bg-white absolute"></div>
+              </div>
+              费用
+            </div>
+          </div>
+        </div>
+
+        {/* ECharts 渲染区 */}
+        <div className="flex-1 w-full h-[200px]">
+          <CollaborationChart />
+        </div>
+      </div>
+
+    </div>
+  );
+};
+
+// ✨ 核心功能：ECharts 图表封装组件
+const CollaborationChart = () => {
+  // ECharts 配置项
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      textStyle: { fontSize: 12 }
+    },
+    // 调整网格边距，让图表撑满可用空间
+    grid: {
+      top: 30,
+      bottom: 20,
+      left: 30,
+      right: 40,
+      containLabel: true
+    },
+    xAxis: [
+      {
+        type: 'category',
+        data: ['立项', '设计', '开模', '打样', '定品', '首单'], // 模拟业务阶段
+        axisPointer: { type: 'shadow' },
+        axisLine: { lineStyle: { color: '#cbd5e1' } }, // 底部灰线 (X轴)
+        axisLabel: { color: '#64748b', fontSize: 11 } 
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        name: '数值',
+        nameTextStyle: { color: '#94a3b8', padding: [0, 30, 0, 0], fontSize: 11 },
+        min: 0,
+        max: 50,
+        interval: 10,
+        axisLabel: { color: '#94a3b8', fontSize: 11 },
+        // 左侧数值Y轴不需要横向虚线网格，保持干净
+        splitLine: { show: false }
+      },
+      {
+        type: 'value',
+        name: '费用',
+        nameTextStyle: { color: '#94a3b8', padding: [0, 0, 0, 30], fontSize: 11 },
+        min: 0,
+        max: 5000,
+        interval: 1000,
+        axisLabel: { color: '#94a3b8', fontSize: 11 },
+        splitLine: { show: false }
+      }
+    ],
+    series: [
+      {
+        name: '时长',
+        type: 'bar',
+        barWidth: '15%',
+        // 蓝紫色的柱子，顶部带有一点圆角
+        itemStyle: { color: '#6366f1', borderRadius: [2, 2, 0, 0] },
+        data: [5, 12, 25, 18, 8, 4]
+      },
+      {
+        name: '样品数',
+        type: 'bar',
+        barWidth: '15%',
+        // 绿色的柱子
+        itemStyle: { color: '#73d13d', borderRadius: [2, 2, 0, 0] },
+        data: [0, 0, 2, 5, 1, 0]
+      },
+      {
+        name: '费用',
+        type: 'line',
+        yAxisIndex: 1, // 绑定到右侧的Y轴
+        // 橙黄色的折线
+        itemStyle: { color: '#fbbf24' },
+        lineStyle: { width: 2 },
+        // 空心圆点标记
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: {
+          color: '#fff', // 圆心白色填充
+          borderColor: '#fbbf24', // 边框橙黄色
+          borderWidth: 2
+        },
+        data: [200, 500, 3500, 1200, 300, 0]
+      }
+    ]
+  };
+
+  return (
+    <ReactECharts 
+      option={option} 
+      style={{ height: '100%', width: '100%' }} 
+      notMerge={true}
+      lazyUpdate={true}
+    />
+  );
+};
+
+// 统计条目组件
+const StatItem = ({ label, value, hasIcon }) => (
+  <div className="flex items-center text-[12px]">
+    <span className="text-slate-700 w-[70px] font-medium">{label}:</span>
+    <div className="flex items-center text-slate-700">
+      {value}
+      {hasIcon && <HelpCircle size={13} className="ml-1 text-slate-400 cursor-help hover:text-slate-600 transition-colors" />}
+    </div>
+  </div>
+);
+
+// 注意参数外面的那对 { }，这叫解构赋值，非常关键！
+const TodoItem = ({ label, value, isLink, onClick }) => (
+  <div 
+    className="flex items-center justify-between text-[12px]"
+    onClick={onClick} 
+  >
+    <span className="text-slate-700 font-medium">{label}:</span>
+    {isLink ? (
+      <span className={`text-[#1890ff] cursor-pointer hover:underline ${value !== '0' ? 'font-bold' : ''}`}>
+        {value}
+      </span>
+    ) : (
+      <span className="text-slate-800">{value}</span>
+    )}
+  </div>
+);
+
+// 基础样式辅助组件
+const StatusTag = ({ status, label }) => {
+  const styles = { pending: 'bg-[#1890ff] text-white rounded-sm', sampling: 'bg-[#fa8c16] text-white rounded-sm', done: 'bg-green-50 text-green-700 border border-green-100' };
+  return <span className={`px-2 py-0.5 text-[11px] whitespace-nowrap font-medium ${styles[status] || 'bg-slate-50 text-slate-600 border border-slate-100'}`}>{label}</span>;
+};
+
+const FilterSelect = ({ placeholder, label, icon, w = "w-auto min-w-[105px]" }) => (
+  <div className={`flex items-center border border-slate-200 rounded h-[30px] px-2.5 text-slate-400 hover:border-sky-400 hover:shadow-sm cursor-pointer bg-white transition-all ${w}`}>
+    {label && <span className="text-slate-700 mr-2.5 border-r border-slate-200 pr-2.5 shrink-0 font-medium">{label}</span>}
+    {icon && <span className="mr-1.5 shrink-0">{icon}</span>}
+    <span className="truncate text-[11px] flex-1">{placeholder}</span><ChevronDown size={12} className="ml-1.5 shrink-0 text-slate-400" />
+  </div>
+);
+
+const PagerBtn = ({ children, active }) => (
+  <span className={`flex items-center justify-center min-w-[26px] h-[26px] border rounded transition-all cursor-pointer text-[11px] font-mono ${active ? 'bg-sky-600 text-white border-sky-600 shadow-md font-semibold' : 'border-slate-200 text-slate-600 bg-white hover:border-sky-400 hover:text-sky-600 hover:shadow-sm'}`}>{children}</span>
+);
+
+
+// 👇 请把下面这 5 行代码，粘贴到这个位置 👇
+const DropdownItem = ({ children, danger }) => (
+  <div className={`px-4 py-2 cursor-pointer transition-colors text-[12px] ${danger ? 'text-red-500 hover:bg-red-50' : 'text-slate-700 hover:bg-sky-50 hover:text-sky-700'}`}>
+    {children}
+  </div>
+);
+// 👆 -------------------------------------- 👆
+
+export default ProposalManagement;
