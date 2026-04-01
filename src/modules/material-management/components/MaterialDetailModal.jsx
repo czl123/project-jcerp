@@ -255,7 +255,7 @@ const MaterialDetailModal = ({ material, onClose }) => {
                  </div>
                  <div>
                     <SubTitle title="关键属性" en="Key Attributes" color="orange" />
-                    <div className="grid grid-cols-4 gap-x-4 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100">
+                    <div className="grid grid-cols-4 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
                        <InfoItem label="公司品牌" value={formData.keyAttrs.company} fieldPath="keyAttrs.company" editType="select" options={MOCK_COMPANY_BRANDS} />
                        <InfoItem label="图案" value={formData.keyAttrs.pattern} fieldPath="keyAttrs.pattern" />
                        <InfoItem label="颜色" value={formData.keyAttrs.color} fieldPath="keyAttrs.color" />
@@ -265,7 +265,7 @@ const MaterialDetailModal = ({ material, onClose }) => {
                  </div>
                  <div>
                     <SubTitle title="一般属性" en="General Attributes" color="gray" />
-                    <div className="grid grid-cols-4 gap-x-4 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100">
+                    <div className="grid grid-cols-4 gap-x-6 gap-y-1 bg-slate-50/30 p-3 rounded-lg border border-slate-100 shadow-sm">
                        <InfoItem label="节日标签" value={formData.general.festival} fieldPath="general.festival" editType="select" options={MOCK_FESTIVALS} />
                        <InfoItem label="季节标签" value={formData.general.season} fieldPath="general.season" editType="select" options={MOCK_SEASONS} />
                        <InfoItem label="是否带电" value={formData.general.battery} fieldPath="general.battery" editType="select" options={["是", "否"]} />
@@ -274,6 +274,10 @@ const MaterialDetailModal = ({ material, onClose }) => {
                        <InfoItem label="材质明细" value={formData.general.materialDetail} fieldPath="general.materialDetail" />
                        <InfoItem label="色号" value={formData.general.colorCode} fieldPath="general.colorCode" />
                        <InfoItem label="规格" value={formData.general.spec} fieldPath="general.spec" editType="select" options={MOCK_SPECS} />
+                       <InfoItem label="二级类目" value={formData.general.subCategory} />
+                       <InfoItem label="Logo可替换" value={formData.general.logoReplaceable} />
+                       <InfoItem label="首单物流方式" value={formData.general.firstLogistics} />
+                       <InfoItem label="建议物流方式" value={formData.general.suggestedLogistics} />
                     </div>
                  </div>
                  <div>
