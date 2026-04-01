@@ -80,6 +80,10 @@ const MaterialDetailModal = ({ material, onClose }) => {
       { id: 1, account: "MoKo-US", site: "US", asin: "B0CB6X6XXX", ver: "V1.0", op: "张运营", listing: "李编写" },
       { id: 2, account: "MoKo-DE", site: "DE", asin: "B0CBZZZYYY", ver: "V1.1", op: "王运营", listing: "赵编写" }
     ],
+    packages: [
+      { id: 1, name: "标准外箱-A", l: "50.0", w: "40.0", h: "30.0", weight: "12.50", index: "PKG-001" },
+      { id: 2, name: "标准外箱-B", l: "45.0", w: "35.0", h: "25.0", weight: "10.20", index: "PKG-002" }
+    ],
     responsibles: {
       dev: { leader: '张团队', pm: '李经理', initialPm: '王初始' },
       procurement: { frontend: '赵前端', backend: '钱后端', initial: '孙初始' },
@@ -649,6 +653,44 @@ const MaterialDetailModal = ({ material, onClose }) => {
                               <td className="px-4 py-2 text-center">
                                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md font-bold border border-emerald-100/50">{row.listing}</span>
                               </td>
+                           </tr>
+                        ))}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+
+            {/* 6. 包裹信息 */}
+            <div ref={sectionRefs['包裹信息']} className="space-y-4 scroll-mt-10">
+               <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm pb-2 border-b border-slate-100 flex items-center justify-between text-slate-800 font-bold text-[14px]">
+                  <div className="flex items-center space-x-2">
+                     <Box size={16} className="text-blue-500" /><span>包裹信息</span>
+                  </div>
+                  <div className="pr-4 text-[10px] text-slate-400 font-normal">
+                     共计 <span className="font-bold text-blue-600">{formData.packages.length}</span> 个包裹方案
+                  </div>
+               </div>
+               <div className="mx-2 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                  <table className="w-full text-left text-[11px] border-collapse">
+                     <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                        <tr>
+                           <th className="px-4 py-2.5 font-bold text-center w-24">包裹序号</th>
+                           <th className="px-4 py-2.5 font-bold">包裹名称</th>
+                           <th className="px-4 py-2.5 font-bold text-center">长(CM)</th>
+                           <th className="px-4 py-2.5 font-bold text-center">宽(CM)</th>
+                           <th className="px-4 py-2.5 font-bold text-center">高(CM)</th>
+                           <th className="px-4 py-2.5 font-bold text-center">毛重(kg)</th>
+                        </tr>
+                     </thead>
+                     <tbody className="divide-y divide-slate-100">
+                        {formData.packages.map((pkg, idx) => (
+                           <tr key={idx} className="hover:bg-blue-50/30 transition-colors group">
+                              <td className="px-4 py-2 text-center text-slate-500 font-mono font-bold">{pkg.index}</td>
+                              <td className="px-4 py-2 font-black text-slate-700">{pkg.name}</td>
+                              <td className="px-4 py-2 text-center font-mono text-slate-600">{pkg.l}</td>
+                              <td className="px-4 py-2 text-center font-mono text-slate-600">{pkg.w}</td>
+                              <td className="px-4 py-2 text-center font-mono text-slate-600">{pkg.h}</td>
+                              <td className="px-4 py-2 text-center font-mono text-blue-600 font-bold">{pkg.weight}</td>
                            </tr>
                         ))}
                      </tbody>
