@@ -129,7 +129,7 @@ const ProductInformationSupplementList = ({
     <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-950 animate-in fade-in duration-500">
       
       {/* 顶部工具栏 */}
-      <div className="px-6 py-2.5 border-b border-slate-200 dark:border-gray-800 flex items-center justify-between bg-slate-50/30 dark:bg-gray-900 shrink-0">
+      <div className="px-6 py-1.5 border-b border-slate-200 dark:border-gray-800 flex items-center justify-between bg-slate-50/30 dark:bg-gray-900 shrink-0">
         <div className="flex items-center space-x-6">
            <div className="flex items-center space-x-2 font-bold text-slate-500 text-[11px]">
               <Filter size={14} />
@@ -162,7 +162,7 @@ const ProductInformationSupplementList = ({
           <thead className="sticky top-0 z-30">
             {/* 分组表头 */}
             <tr className="bg-slate-50 dark:bg-gray-800">
-              <th rowSpan={2} className="px-6 py-3 w-12 border-b border-slate-200 dark:border-gray-700 sticky left-0 z-50 bg-slate-50 dark:bg-gray-800 border-r border-slate-200 shadow-[1px_0_0_0_#e2e8f0]">
+              <th rowSpan={2} className="px-6 py-2 w-12 border-b border-slate-200 dark:border-gray-700 sticky left-0 z-50 bg-slate-50 dark:bg-gray-800 border-r border-slate-200 shadow-[1px_0_0_0_#e2e8f0]">
                 <input 
                   type="checkbox" 
                   className="rounded border-slate-300" 
@@ -174,7 +174,7 @@ const ProductInformationSupplementList = ({
                 <th 
                   key={group.id} 
                   colSpan={group.count} 
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider border-b border-r border-slate-200 dark:border-gray-700 text-center ${group.color} ${
+                  className={`px-4 py-1 text-[10px] font-black uppercase tracking-wider border-b border-r border-slate-200 dark:border-gray-700 text-center ${group.color} ${
                     group.id === 'base' ? 'sticky left-12 z-50 shadow-[1px_0_0_0_#e2e8f0]' : ''
                   }`}
                   style={group.id === 'base' ? { left: '48px' } : {}}
@@ -182,7 +182,7 @@ const ProductInformationSupplementList = ({
                   {group.label}
                 </th>
               ))}
-              <th rowSpan={2} className="px-6 py-3 w-[120px] border-b border-slate-200 dark:border-gray-700 sticky right-0 z-50 bg-slate-50 dark:bg-gray-800 shadow-[-1px_0_0_0_#e2e8f0] text-center text-[11px] font-extrabold text-slate-400">操作</th>
+              <th rowSpan={2} className="px-6 py-2 w-[120px] border-b border-slate-200 dark:border-gray-700 sticky right-0 z-50 bg-slate-50 dark:bg-gray-800 shadow-[-1px_0_0_0_#e2e8f0] text-center text-[11px] font-extrabold text-slate-400">操作</th>
             </tr>
             
             {/* 字段表头 */}
@@ -190,7 +190,7 @@ const ProductInformationSupplementList = ({
               {displayColumns.map(col => (
                 <th 
                   key={col.key} 
-                  className={`px-4 py-3 text-[11px] font-extrabold border-b border-r border-slate-100 dark:border-gray-800 uppercase tracking-wider text-center ${col.width} ${
+                  className={`px-2 py-1 text-[11px] font-extrabold border-b border-r border-slate-100 dark:border-gray-800 uppercase tracking-tight text-center ${col.width} ${
                     col.sticky ? 'sticky z-40 bg-white dark:bg-gray-900 shadow-[1px_0_0_0_#f1f5f9]' : ''
                   } ${
                     col.group === 'basic' ? 'text-blue-600 bg-blue-50/10' : 
@@ -202,9 +202,8 @@ const ProductInformationSupplementList = ({
                   }`}
                   style={col.sticky ? { left: col.offset } : {}}
                 >
-                  <div className="flex items-center justify-center space-x-1">
-                    <span>{col.label}</span>
-                    <ArrowUpDown size={10} className="text-slate-300 opacity-0 group-hover:opacity-100" />
+                  <div className="flex items-center justify-center whitespace-nowrap overflow-hidden">
+                    <span className="truncate">{col.label}</span>
                   </div>
                 </th>
               ))}
@@ -214,7 +213,7 @@ const ProductInformationSupplementList = ({
           <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
             {samples.map((sample) => (
               <tr key={sample.id} className="hover:bg-blue-50/20 dark:hover:bg-blue-900/5 transition-colors group">
-                <td className="px-6 py-4 sticky left-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors border-b border-r border-slate-100 dark:border-gray-800 text-center shadow-[1px_0_0_0_#f1f5f9]">
+                <td className="px-6 py-2 sticky left-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors border-b border-r border-slate-100 dark:border-gray-800 text-center shadow-[1px_0_0_0_#f1f5f9]">
                   <input 
                     type="checkbox" 
                     className="rounded border-slate-300" 
@@ -227,7 +226,7 @@ const ProductInformationSupplementList = ({
                   <DynamicCell key={col.key} col={col} sample={sample} onEdit={handleEdit} />
                 ))}
 
-                <td className="px-6 py-4 text-right sticky right-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors shadow-[-1px_0_0_0_#f1f5f9] border-b border-slate-100 dark:border-gray-800">
+                <td className="px-6 py-2 text-right sticky right-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors shadow-[-1px_0_0_0_#f1f5f9] border-b border-slate-100 dark:border-gray-800">
                   <div className="flex items-center justify-end space-x-4">
                     <button 
                       onClick={() => handleEdit(sample.id)} 
@@ -260,7 +259,7 @@ const ProductInformationSupplementList = ({
 
 // --- 子组件：动态单元格渲染器 ---
 const DynamicCell = ({ col, sample, onEdit }) => {
-  const commonClasses = `px-4 py-4 border-b border-r border-slate-50 dark:border-gray-800 text-center ${
+  const commonClasses = `px-4 py-2 border-b border-r border-slate-50 dark:border-gray-800 text-center ${
     col.sticky ? 'sticky z-20 bg-white dark:bg-gray-950 shadow-[1px_0_0_0_#f1f5f9]' : ''
   }`;
   const style = col.sticky ? { left: col.offset } : {};
