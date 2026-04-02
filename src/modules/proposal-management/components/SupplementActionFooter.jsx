@@ -38,12 +38,14 @@ const SupplementActionFooter = ({
         >
           取消
         </button>
-        <button 
-          onClick={onSaveAll}
-          className="px-8 py-1 bg-emerald-500 dark:bg-emerald-600 text-white rounded-[3px] text-[11px] font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 shadow-md transition-all active:scale-95 uppercase tracking-wider"
-        >
-          全部保存
-        </button>
+        {onSaveAll && (
+          <button 
+            onClick={onSaveAll}
+            className="px-8 py-1 bg-emerald-500 dark:bg-emerald-600 text-white rounded-[3px] text-[11px] font-bold hover:bg-emerald-600 dark:hover:bg-emerald-500 shadow-md transition-all active:scale-95 uppercase tracking-wider"
+          >
+            全部保存
+          </button>
+        )}
         <button 
           disabled={isSyncing}
           onClick={onSubmitAll}

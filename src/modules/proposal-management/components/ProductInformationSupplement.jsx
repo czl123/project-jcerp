@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sidebar as SidebarIcon, Table as TableIcon } from 'lucide-react';
+import { X, Sidebar as SidebarIcon, Table as TableIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import SampleListSidebar from './SampleListSidebar';
 import ProductInformationSupplementList from './ProductInformationSupplementList';
 import SampleEditSection from './SampleEditSection';
@@ -8,6 +8,7 @@ import SupplementActionFooter from './SupplementActionFooter';
 
 const ProductDetailModal = ({ onClose }) => {
   const [layoutMode, setLayoutMode] = useState('classic'); // 'classic', 'list'
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const [samples, setSamples] = useState([
     { id: 'KFY-2026030002', name: '样品 01', status: 'completed', isDirty: true, purchaser: '张三' },
     { id: 'KFY-2026030003', name: '样品 02', status: 'pending', isDirty: false, purchaser: '李四' }
@@ -131,71 +132,108 @@ const ProductDetailModal = ({ onClose }) => {
 
         {/* 2. 顶部汇总信息栏 - 现在在平铺和列表视图下都显示 */}
         {(layoutMode === 'classic' || layoutMode === 'list') && (
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 space-y-3">
-            <div className="border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px]">
-              <table className="w-full border-collapse text-center">
-                <tbody>
-                  <tr className="bg-slate-50 dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-b border-slate-200 dark:border-gray-700">
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700 w-[15%]">运营大类</td>
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700 w-[15%] text-sky-600 dark:text-sky-400 font-bold">团队负责人</td>
-                    <td colSpan={5}></td>
-                  </tr>
-                  <tr className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 font-medium text-slate-700 dark:text-gray-200">
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700">照明用品</td>
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700 text-sky-600 dark:text-sky-400">张雪健</td>
-                    <td colSpan={5}></td>
-                  </tr>
-                  <tr className="bg-slate-50 dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-b border-slate-200 dark:border-gray-700">
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">产品名称</td>
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">款式</td>
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">主材料</td>
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">适用品牌或对象</td>
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">型号</td>
-                    <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">SPU</td>
-                    <td className="py-1.5 px-2">产品经理</td>
-                  </tr>
-                  <tr className="bg-white dark:bg-gray-900 font-medium text-slate-700 dark:text-gray-200">
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700">工作灯</td>
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700">带支架款</td>
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700">PC+铝合金+尼龙</td>
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700">-</td>
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700">-</td>
-                    <td className="py-2 border-r border-slate-200 dark:border-gray-700 font-mono text-[10px]">ZM0007</td>
-                    <td className="py-2">储张玲</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div className={`px-4 ${isHeaderCollapsed ? 'py-1.5' : 'py-3'} border-b border-slate-100 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 transition-all duration-300 relative`}>
+            <div className="flex items-center justify-between mb-1">
+               {isHeaderCollapsed ? (
+                 <div className="flex items-center space-x-6 text-[11px] text-slate-500 animate-in fade-in slide-in-from-left-2 duration-300">
+                    <div className="flex items-center">
+                      <span className="text-slate-400 mr-2">SPU:</span>
+                      <span className="font-mono font-bold text-slate-700 dark:text-gray-300 bg-slate-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">ZM0007</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-slate-400 mr-2">产品名称:</span>
+                      <span className="font-bold text-slate-700 dark:text-gray-300">工作灯</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-slate-400 mr-2">款式:</span>
+                      <span className="font-medium text-slate-600 dark:text-gray-400">带支架款</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-slate-400 mr-2">产品经理:</span>
+                      <span className="font-medium text-slate-600 dark:text-gray-400">储张玲</span>
+                    </div>
+                 </div>
+               ) : (
+                 <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">汇总信息</div>
+               )}
+               <button 
+                 onClick={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
+                 className="p-1 hover:bg-slate-100 dark:hover:bg-gray-800 rounded transition-colors text-slate-400 hover:text-blue-500 flex items-center space-x-1"
+                 title={isHeaderCollapsed ? "展开" : "折叠"}
+               >
+                 <span className="text-[10px] font-bold">{isHeaderCollapsed ? '展开详情' : '折叠'}</span>
+                 {isHeaderCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+               </button>
             </div>
 
-            {/* 底部标签信息 - 参考图片样式 */}
-            <div className="flex items-center space-x-2 mt-3">
-              <div className="flex border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px] h-7 w-[250px]">
-                <div className="bg-slate-50 dark:bg-gray-800 px-3 flex items-center text-slate-500 dark:text-gray-400 border-r border-slate-200 dark:border-gray-700 min-w-[70px]">
-                  开发品牌:
+            {!isHeaderCollapsed && (
+              <div className="space-y-3 animate-in fade-in zoom-in-95 duration-200 origin-top">
+                <div className="border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px]">
+                  <table className="w-full border-collapse text-center">
+                    <tbody>
+                      <tr className="bg-slate-50 dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-b border-slate-200 dark:border-gray-700">
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700 w-[15%]">运营大类</td>
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700 w-[15%] text-sky-600 dark:text-sky-400 font-bold">团队负责人</td>
+                        <td colSpan={5}></td>
+                      </tr>
+                      <tr className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 font-medium text-slate-700 dark:text-gray-200">
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700">照明用品</td>
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700 text-sky-600 dark:text-sky-400">张雪健</td>
+                        <td colSpan={5}></td>
+                      </tr>
+                      <tr className="bg-slate-50 dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-b border-slate-200 dark:border-gray-700">
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">产品名称</td>
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">款式</td>
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">主材料</td>
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">适用品牌或对象</td>
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">型号</td>
+                        <td className="py-1.5 border-r border-slate-200 dark:border-gray-700">SPU</td>
+                        <td className="py-1.5 px-2">产品经理</td>
+                      </tr>
+                      <tr className="bg-white dark:bg-gray-900 font-medium text-slate-700 dark:text-gray-200">
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700">工作灯</td>
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700">带支架款</td>
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700">PC+铝合金+尼龙</td>
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700">-</td>
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700">-</td>
+                        <td className="py-2 border-r border-slate-200 dark:border-gray-700 font-mono text-[10px]">ZM0007</td>
+                        <td className="py-2">储张玲</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <div className="bg-white dark:bg-gray-900 px-3 flex items-center text-slate-700 dark:text-gray-200 flex-1">
-                  MoKo
-                </div>
-              </div>
 
-              <div className="flex border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px] h-7 w-[250px]">
-                <div className="bg-slate-50 dark:bg-gray-800 px-3 flex items-center text-slate-500 dark:text-gray-400 border-r border-slate-200 dark:border-gray-700 min-w-[70px]">
-                  季节标签:
-                </div>
-                <div className="bg-white dark:bg-gray-900 px-3 flex items-center text-slate-700 dark:text-gray-200 flex-1">
-                  无
-                </div>
-              </div>
+                {/* 底部标签信息 - 参考图片样式 */}
+                <div className="flex items-center space-x-2 mt-3">
+                  <div className="flex border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px] h-7 w-[250px]">
+                    <div className="bg-slate-50 dark:bg-gray-800 px-3 flex items-center text-slate-500 dark:text-gray-400 border-r border-slate-200 dark:border-gray-700 min-w-[70px]">
+                      开发品牌:
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 px-3 flex items-center text-slate-700 dark:text-gray-200 flex-1">
+                      MoKo
+                    </div>
+                  </div>
 
-              <div className="flex border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px] h-7 w-[250px]">
-                <div className="bg-slate-50 dark:bg-gray-800 px-3 flex items-center text-slate-500 dark:text-gray-400 border-r border-slate-200 dark:border-gray-700 min-w-[70px]">
-                  节日标签:
-                </div>
-                <div className="bg-white dark:bg-gray-900 px-3 flex items-center text-slate-700 dark:text-gray-200 flex-1">
-                  春节
+                  <div className="flex border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px] h-7 w-[250px]">
+                    <div className="bg-slate-50 dark:bg-gray-800 px-3 flex items-center text-slate-500 dark:text-gray-400 border-r border-slate-200 dark:border-gray-700 min-w-[70px]">
+                      季节标签:
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 px-3 flex items-center text-slate-700 dark:text-gray-200 flex-1">
+                      无
+                    </div>
+                  </div>
+
+                  <div className="flex border border-slate-200 dark:border-gray-700 rounded-sm overflow-hidden text-[11px] h-7 w-[250px]">
+                    <div className="bg-slate-50 dark:bg-gray-800 px-3 flex items-center text-slate-500 dark:text-gray-400 border-r border-slate-200 dark:border-gray-700 min-w-[70px]">
+                      节日标签:
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 px-3 flex items-center text-slate-700 dark:text-gray-200 flex-1">
+                      春节
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -278,6 +316,7 @@ const ProductDetailModal = ({ onClose }) => {
         {layoutMode === 'list' && (
           <ProductInformationSupplementList 
             samples={samples} 
+            onUpdateSamples={setSamples}
             setActiveTab={setActiveTab} 
             setLayoutMode={setLayoutMode} 
             onCopy={handleCopy}
@@ -293,15 +332,14 @@ const ProductDetailModal = ({ onClose }) => {
         )}
 
         {/* 5. 底部公共操作按钮 */}
-        <SupplementActionFooter 
+        <SupplementActionFooter
           isSyncing={isSyncing}
           syncStatus={syncStatus}
           onSyncAll={handleSyncAll}
-          onSaveAll={handleSaveAll}
+          onSaveAll={layoutMode === 'list' ? null : handleSaveAll}
           onSubmitAll={handleSubmitAll}
           onCancel={onClose}
-        />
-        </div>
+        />        </div>
         </div>
   );
 };

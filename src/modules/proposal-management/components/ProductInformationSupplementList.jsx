@@ -6,6 +6,7 @@ import {
 
 const ProductInformationSupplementList = ({ 
   samples, 
+  onUpdateSamples,
   setActiveTab, 
   setLayoutMode: setGlobalLayoutMode, 
   onCopy, 
@@ -15,6 +16,7 @@ const ProductInformationSupplementList = ({
   onSelectAll
 }) => {
   const [viewMode, setViewMode] = useState('全部字段视图');
+  const [editingCell, setEditingCell] = useState(null); // { id: string, key: string }
 
   // 1. 定义大类分组基础配置
   const allGroups = [
@@ -125,6 +127,15 @@ const ProductInformationSupplementList = ({
     setGlobalLayoutMode('edit');
   };
 
+  const handleUpdateField = (sampleId, key, value) => {
+    onUpdateSamples(prev => prev.map(s => s.id === sampleId ? { ...s, [key]: value, isDirty: true } : s));
+    setEditingCell(null);
+  };
+
+  const handleSelectAll = (checked) => {
+    onSelectAll(checked);
+  };
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-950 animate-in fade-in duration-500">
       
@@ -167,7 +178,7 @@ const ProductInformationSupplementList = ({
                   type="checkbox" 
                   className="rounded border-slate-300" 
                   checked={selectedIds?.length === samples.length && samples.length > 0}
-                  onChange={(e) => onSelectAll(e.target.checked)}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
                 />
               </th>
               {currentGroups.map(group => (
@@ -211,45 +222,65 @@ const ProductInformationSupplementList = ({
           </thead>
 
           <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
-            {samples.map((sample) => (
-              <tr key={sample.id} className="hover:bg-blue-50/20 dark:hover:bg-blue-900/5 transition-colors group">
-                <td className="px-6 py-2 sticky left-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors border-b border-r border-slate-100 dark:border-gray-800 text-center shadow-[1px_0_0_0_#f1f5f9]">
-                  <input 
-                    type="checkbox" 
-                    className="rounded border-slate-300" 
-                    checked={selectedIds?.includes(sample.id)}
-                    onChange={() => onToggleSelect(sample.id)}
-                  />
-                </td>
+            {samples.map((sample) => {
+              const missingCount = allColumns.filter(col => 
+                col.isRequired && (!sample[col.key] || sample[col.key].toString().trim() === '')
+              ).length;
 
-                {displayColumns.map(col => (
-                  <DynamicCell key={col.key} col={col} sample={sample} onEdit={handleEdit} />
-                ))}
+              return (
+                <tr key={sample.id} className="hover:bg-blue-50/20 dark:hover:bg-blue-900/5 transition-colors group">
+                  <td className="px-6 py-2 sticky left-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors border-b border-r border-slate-100 dark:border-gray-800 text-center shadow-[1px_0_0_0_#f1f5f9]">
+                    <input 
+                      type="checkbox" 
+                      className="rounded border-slate-300" 
+                      checked={selectedIds?.includes(sample.id)}
+                      onChange={() => onToggleSelect(sample.id)}
+                    />
+                  </td>
 
-                <td className="px-6 py-2 text-right sticky right-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors shadow-[-1px_0_0_0_#f1f5f9] border-b border-slate-100 dark:border-gray-800">
-                  <div className="flex items-center justify-end space-x-4">
-                    <button 
-                      onClick={() => handleEdit(sample.id)} 
-                      className="text-emerald-600 dark:text-emerald-400 font-black text-[10px] transition-all hover:text-emerald-500 hover:scale-110 active:scale-95"
-                    >
-                      编辑
-                    </button>
-                    <button 
-                      onClick={() => onCopy(sample)} 
-                      className="text-blue-600 dark:text-blue-400 font-black text-[10px] transition-all hover:text-blue-500 hover:scale-110 active:scale-95"
-                    >
-                      复制
-                    </button>
-                    <button 
-                      onClick={() => onDelete(sample.id)} 
-                      className="text-red-500 dark:text-red-400 font-black text-[10px] transition-all hover:text-red-600 hover:scale-110 active:scale-95"
-                    >
-                      删除
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  {displayColumns.map(col => (
+                    <DynamicCell 
+                      key={col.key} 
+                      col={col} 
+                      sample={sample} 
+                      editingCell={editingCell}
+                      setEditingCell={setEditingCell}
+                      onUpdate={handleUpdateField}
+                    />
+                  ))}
+
+                  <td className="px-6 py-2 text-right sticky right-0 z-20 bg-white dark:bg-gray-950 group-hover:bg-blue-50/50 transition-colors shadow-[-1px_0_0_0_#f1f5f9] border-b border-slate-100 dark:border-gray-800">
+                    <div className="flex items-center justify-end space-x-4">
+                      <div className="relative group/btn">
+                        <button 
+                          onClick={() => handleEdit(sample.id)} 
+                          className="text-emerald-600 dark:text-emerald-400 font-black text-[10px] transition-all hover:text-emerald-500 hover:scale-110 active:scale-95"
+                        >
+                          编辑
+                        </button>
+                        {missingCount > 0 && (
+                          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full shadow-sm animate-pulse">
+                            {missingCount}
+                          </span>
+                        )}
+                      </div>
+                      <button 
+                        onClick={() => onCopy(sample)} 
+                        className="text-blue-600 dark:text-blue-400 font-black text-[10px] transition-all hover:text-blue-500 hover:scale-110 active:scale-95"
+                      >
+                        复制
+                      </button>
+                      <button 
+                        onClick={() => onDelete(sample.id)} 
+                        className="text-red-500 dark:text-red-400 font-black text-[10px] transition-all hover:text-red-600 hover:scale-110 active:scale-95"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -258,13 +289,37 @@ const ProductInformationSupplementList = ({
 };
 
 // --- 子组件：动态单元格渲染器 ---
-const DynamicCell = ({ col, sample, onEdit }) => {
-  const commonClasses = `px-4 py-2 border-b border-r border-slate-50 dark:border-gray-800 text-left ${
+const DynamicCell = ({ col, sample, editingCell, setEditingCell, onUpdate }) => {
+  const isEditing = editingCell?.id === sample.id && editingCell?.key === col.key;
+  const canEdit = !['image', 'status', 'purchaser', 'button', 'link', 'image_btn'].includes(col.type) && col.key !== 'id';
+  const isMissingRequired = col.isRequired && (!sample[col.key] || sample[col.key].toString().trim() === '');
+
+  const commonClasses = `px-4 py-2 border-b border-r border-slate-50 dark:border-gray-800 text-left relative group/cell ${
     col.sticky ? 'sticky z-20 bg-white dark:bg-gray-950 shadow-[1px_0_0_0_#f1f5f9]' : ''
+  } ${isEditing ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''} ${
+    isMissingRequired && !isEditing ? 'bg-red-50/50 dark:bg-red-900/10' : ''
   }`;
+  
   const style = col.sticky ? { left: col.offset } : {};
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') onUpdate(sample.id, col.key, e.target.value);
+    if (e.key === 'Escape') setEditingCell(null);
+  };
+
   const renderContent = () => {
+    if (isEditing) {
+      return (
+        <input
+          autoFocus
+          className="w-full bg-white dark:bg-gray-800 border border-blue-400 dark:border-blue-500 rounded px-1.5 py-0.5 text-[11px] outline-none shadow-[0_0_0_2px_rgba(59,130,246,0.1)]"
+          defaultValue={sample[col.key] || ''}
+          onBlur={(e) => onUpdate(sample.id, col.key, e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      );
+    }
+
     switch (col.type) {
       case 'image':
         return (
@@ -299,10 +354,37 @@ const DynamicCell = ({ col, sample, onEdit }) => {
       case 'image_btn':
         return <button className="text-slate-400 hover:text-blue-500"><ImageIcon size={14} /></button>;
       default:
+        const textValue = sample[col.key] || '-';
+
         return (
-          <span className={`text-[11px] ${col.type === 'mono' ? 'font-mono' : 'font-medium'} text-slate-600 dark:text-gray-400 line-clamp-1`}>
-            {sample[col.key] || '-'}
-          </span>
+          <div 
+            className="flex items-center justify-between min-h-[20px] cursor-pointer relative"
+            onClick={() => canEdit && setEditingCell({ id: sample.id, key: col.key })}
+          >
+            <span className={`text-[11px] ${col.type === 'mono' ? 'font-mono' : 'font-medium'} text-slate-600 dark:text-gray-400 line-clamp-1 flex-1`}>
+              {textValue}
+            </span>
+            
+            {/* Tooltip 预览气泡 - 移除长度限制 */}
+            {!isEditing && textValue !== '-' && (
+              <div className="invisible group-hover/cell:visible fixed z-[100] bg-slate-800 dark:bg-slate-700 text-white text-[11px] p-2.5 rounded shadow-xl max-w-[300px] break-words whitespace-normal pointer-events-none -translate-y-full -translate-x-4 mb-2 animate-in fade-in zoom-in-95 duration-200 border border-slate-600">
+                <div className="font-bold text-slate-400 mb-1 border-b border-slate-600 pb-1 flex items-center justify-between">
+                   <span>{col.label}</span>
+                   <span className="text-[9px] font-normal bg-slate-600 px-1 rounded ml-2">完整预览</span>
+                </div>
+                {textValue}
+                {/* 气泡小三角 */}
+                <div className="absolute bottom-0 left-6 translate-y-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-slate-800 dark:border-t-slate-700"></div>
+              </div>
+            )}
+
+            {canEdit && (
+              <Edit3 
+                size={10} 
+                className="text-blue-400 opacity-0 group-hover/cell:opacity-100 transition-opacity ml-1 shrink-0" 
+              />
+            )}
+          </div>
         );
     }
   };
