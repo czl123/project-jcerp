@@ -131,7 +131,7 @@ const ProductInformationSupplementList = ({
       {/* 顶部工具栏 */}
       <div className="px-6 py-1.5 border-b border-slate-200 dark:border-gray-800 flex items-center justify-between bg-slate-50/30 dark:bg-gray-900 shrink-0">
         <div className="flex items-center space-x-6">
-           <div className="flex items-center space-x-2 font-bold text-slate-500 text-[11px]">
+           <div className="flex items-center space-x-2 font-bold text-slate-500 text-[10px]">
               <Filter size={14} />
               <span>视图设置:</span>
               <select 
@@ -150,7 +150,7 @@ const ProductInformationSupplementList = ({
               </select>
            </div>
         </div>
-        <div className="text-[11px] text-slate-400 font-mono flex items-center space-x-4">
+        <div className="text-[10px] text-slate-400 font-mono flex items-center space-x-4">
            <span>Displaying {displayColumns.length} columns</span>
         </div>
       </div>
@@ -174,7 +174,7 @@ const ProductInformationSupplementList = ({
                 <th 
                   key={group.id} 
                   colSpan={group.count} 
-                  className={`px-4 py-1 text-[10px] font-black uppercase tracking-wider border-b border-r border-slate-200 dark:border-gray-700 text-center ${group.color} ${
+                  className={`px-4 py-1 text-[9px] font-black uppercase tracking-wider border-b border-r border-slate-200 dark:border-gray-700 text-left ${group.color} ${
                     group.id === 'base' ? 'sticky left-12 z-50 shadow-[1px_0_0_0_#e2e8f0]' : ''
                   }`}
                   style={group.id === 'base' ? { left: '48px' } : {}}
@@ -182,7 +182,7 @@ const ProductInformationSupplementList = ({
                   {group.label}
                 </th>
               ))}
-              <th rowSpan={2} className="px-6 py-2 w-[120px] border-b border-slate-200 dark:border-gray-700 sticky right-0 z-50 bg-slate-50 dark:bg-gray-800 shadow-[-1px_0_0_0_#e2e8f0] text-center text-[11px] font-extrabold text-slate-400">操作</th>
+              <th rowSpan={2} className="px-6 py-2 w-[120px] border-b border-slate-200 dark:border-gray-700 sticky right-0 z-50 bg-slate-50 dark:bg-gray-800 shadow-[-1px_0_0_0_#e2e8f0] text-right text-[10px] font-extrabold text-slate-400">操作</th>
             </tr>
             
             {/* 字段表头 */}
@@ -190,7 +190,7 @@ const ProductInformationSupplementList = ({
               {displayColumns.map(col => (
                 <th 
                   key={col.key} 
-                  className={`px-2 py-1 text-[11px] font-extrabold border-b border-r border-slate-100 dark:border-gray-800 uppercase tracking-tight text-center ${col.width} ${
+                  className={`px-4 py-1 text-[10px] font-extrabold border-b border-r border-slate-100 dark:border-gray-800 uppercase tracking-tight text-left ${col.width} ${
                     col.sticky ? 'sticky z-40 bg-white dark:bg-gray-900 shadow-[1px_0_0_0_#f1f5f9]' : ''
                   } ${
                     col.group === 'basic' ? 'text-blue-600 bg-blue-50/10' : 
@@ -202,7 +202,7 @@ const ProductInformationSupplementList = ({
                   }`}
                   style={col.sticky ? { left: col.offset } : {}}
                 >
-                  <div className="flex items-center justify-center whitespace-nowrap overflow-hidden">
+                  <div className="flex items-center whitespace-nowrap overflow-hidden">
                     <span className="truncate">{col.label}</span>
                   </div>
                 </th>
@@ -230,19 +230,19 @@ const ProductInformationSupplementList = ({
                   <div className="flex items-center justify-end space-x-4">
                     <button 
                       onClick={() => handleEdit(sample.id)} 
-                      className="text-emerald-600 dark:text-emerald-400 font-black text-[11px] transition-all hover:text-emerald-500 hover:scale-110 active:scale-95"
+                      className="text-emerald-600 dark:text-emerald-400 font-black text-[10px] transition-all hover:text-emerald-500 hover:scale-110 active:scale-95"
                     >
                       编辑
                     </button>
                     <button 
                       onClick={() => onCopy(sample)} 
-                      className="text-blue-600 dark:text-blue-400 font-black text-[11px] transition-all hover:text-blue-500 hover:scale-110 active:scale-95"
+                      className="text-blue-600 dark:text-blue-400 font-black text-[10px] transition-all hover:text-blue-500 hover:scale-110 active:scale-95"
                     >
                       复制
                     </button>
                     <button 
                       onClick={() => onDelete(sample.id)} 
-                      className="text-red-500 dark:text-red-400 font-black text-[11px] transition-all hover:text-red-600 hover:scale-110 active:scale-95"
+                      className="text-red-500 dark:text-red-400 font-black text-[10px] transition-all hover:text-red-600 hover:scale-110 active:scale-95"
                     >
                       删除
                     </button>
@@ -259,7 +259,7 @@ const ProductInformationSupplementList = ({
 
 // --- 子组件：动态单元格渲染器 ---
 const DynamicCell = ({ col, sample, onEdit }) => {
-  const commonClasses = `px-4 py-2 border-b border-r border-slate-50 dark:border-gray-800 text-center ${
+  const commonClasses = `px-4 py-2 border-b border-r border-slate-50 dark:border-gray-800 text-left ${
     col.sticky ? 'sticky z-20 bg-white dark:bg-gray-950 shadow-[1px_0_0_0_#f1f5f9]' : ''
   }`;
   const style = col.sticky ? { left: col.offset } : {};
@@ -268,42 +268,39 @@ const DynamicCell = ({ col, sample, onEdit }) => {
     switch (col.type) {
       case 'image':
         return (
-          <div className="w-10 h-10 mx-auto bg-slate-50 dark:bg-gray-800 rounded border border-slate-200 overflow-hidden flex items-center justify-center">
+          <div className="w-10 h-10 bg-slate-50 dark:bg-gray-800 rounded border border-slate-200 overflow-hidden flex items-center justify-center">
             <img src="https://img.alicdn.com/imgextra/i4/2206623910383/O1CN01r1Y3X21T8N1N1N1N1_!!2206623910383.jpg" className="max-w-full max-h-full object-contain" />
           </div>
         );
       case 'status':
         return (
-          <div className="flex justify-center">
+          <div className="flex">
             {sample.status === 'completed' ? (
-              <div className="flex items-center space-x-1.5 text-blue-600 font-black">
-                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                <span className="text-[10px] uppercase">待编辑</span>
+              <div className="flex items-center text-blue-600 font-black">
+                <span className="text-[9px] uppercase">待编辑</span>
               </div>
             ) : (
-              <div className="flex items-center space-x-1.5 text-orange-600 font-black">
-                <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
-                <span className="text-[10px] uppercase">待提交</span>
+              <div className="flex items-center text-orange-600 font-black">
+                <span className="text-[9px] uppercase">待提交</span>
               </div>
             )}
           </div>
         );
       case 'purchaser':
         return (
-          <div className="flex items-center justify-center space-x-2 text-[12px]">
-             <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[9px] font-bold">储</div>
+          <div className="flex items-center text-[11px]">
              <span className="text-slate-700 dark:text-gray-200">储张玲</span>
           </div>
         );
       case 'button':
-        return <button className="text-emerald-600 font-bold text-[11px]">查看</button>;
+        return <button className="text-emerald-600 font-bold text-[10px]">查看</button>;
       case 'link':
-        return <button className="text-blue-500 hover:text-blue-700"><LinkIcon size={14} className="mx-auto" /></button>;
+        return <button className="text-blue-500 hover:text-blue-700"><LinkIcon size={14} /></button>;
       case 'image_btn':
-        return <button className="text-slate-400 hover:text-blue-500"><ImageIcon size={14} className="mx-auto" /></button>;
+        return <button className="text-slate-400 hover:text-blue-500"><ImageIcon size={14} /></button>;
       default:
         return (
-          <span className={`text-[12px] ${col.type === 'mono' ? 'font-mono' : 'font-medium'} text-slate-600 dark:text-gray-400 line-clamp-1`}>
+          <span className={`text-[11px] ${col.type === 'mono' ? 'font-mono' : 'font-medium'} text-slate-600 dark:text-gray-400 line-clamp-1`}>
             {sample[col.key] || '-'}
           </span>
         );
