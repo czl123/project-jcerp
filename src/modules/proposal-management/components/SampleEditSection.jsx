@@ -1,11 +1,23 @@
-import React, { useState, useRef } from 'react';
-import { Package, HelpCircle, ChevronDown, Upload, Calendar, Plus, X, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Package, HelpCircle, ChevronDown, Upload, Calendar, Plus, X, RefreshCw, ChevronRight, CheckCircle2, List } from 'lucide-react';
 import { SectionHeader, InputRow, SizeRow, TextAreaGroup, WeightInputRow } from './FormComponents';
 
-const SampleEditSection = ({ samples, activeTab, setLayoutMode }) => {
+const SampleEditSection = ({ samples, activeTab, setActiveTab, setLayoutMode }) => {
   const [isMultiPackage, setIsMultiPackage] = useState(false); // 是否一品多包
   const [packageCount, setPackageCount] = useState(2); // 默认包裹数量
   const [patentType, setPatentType] = useState('无专利'); // 专利说明状态
+
+  // --- 导航逻辑：查找下一个样品 ---
+  const currentIndex = samples.findIndex(s => s.id === activeTab);
+  const nextSample = samples[currentIndex + 1];
+  const isLastSample = !nextSample;
+
+  // --- 优化：Toast 提示 ---
+  const [toast, setToast] = useState(null);
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 2500);
+  };
 
   // --- 优化1：未保存状态提醒 ---
   const [hasChanges, setHasChanges] = useState(false);
@@ -23,19 +35,38 @@ const SampleEditSection = ({ samples, activeTab, setLayoutMode }) => {
 
   const handleSaveClick = () => {
     setHasChanges(false);
-    setLayoutMode('list');
+    showToast(`样品 ${activeTab} 已成功保存`);
+    setTimeout(() => setLayoutMode('list'), 500);
   };
 
-  // --- 优化3：一键应用到所有样品 ---
-  const [isSyncing, setIsSyncing] = useState(false);
-  const handleSyncAll = () => {
-    setIsSyncing(true);
-    // 模拟同步逻辑
-    setTimeout(() => {
-      setIsSyncing(false);
-      // 这里可以添加 Toast 提示或状态更新逻辑
-    }, 800);
+  const handleSaveAndNext = () => {
+    const savedId = activeTab;
+    setHasChanges(false);
+    if (nextSample) {
+      setActiveTab(nextSample.id);
+      showToast(`样品 ${savedId} 保存成功，已切换到下一个`);
+      document.querySelector('.overflow-y-auto')?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      showToast(`所有样品已保存，正在返回列表`);
+      setTimeout(() => setLayoutMode('list'), 1000);
+    }
   };
+
+  // --- 进阶优化1：键盘快捷键 ---
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSaveClick();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSaveAndNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, nextSample, hasChanges]);
 
   // --- 优化2：图片预览功能 ---
   const [patentImage, setPatentImage] = useState(null);
@@ -87,6 +118,16 @@ const SampleEditSection = ({ samples, activeTab, setLayoutMode }) => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative transition-colors duration-300 bg-white dark:bg-gray-900 font-sans" onChange={handleFormChange}>
       
+      {/* Toast 提示容器 */}
+      {toast && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[1000] animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="bg-slate-800 dark:bg-slate-700 text-white px-4 py-2 rounded-full shadow-2xl flex items-center space-x-3 border border-slate-600">
+            <CheckCircle2 size={16} className="text-emerald-400" />
+            <span className="text-[12px] font-bold tracking-wide">{toast}</span>
+          </div>
+        </div>
+      )}
+
       {/* 顶部标题栏 */}
       <div className="bg-slate-50/50 dark:bg-gray-800/50 border-b border-slate-200 dark:border-gray-700 px-6 py-2.5 flex items-center justify-end sticky top-0 z-20 shadow-sm transition-colors duration-300">
         <div className="flex items-center space-x-2 text-[11px] font-bold text-slate-400">
@@ -243,14 +284,16 @@ const SampleEditSection = ({ samples, activeTab, setLayoutMode }) => {
                <div className="col-span-5">
                   <SectionHeader title="营销卖点设计" icon={Package} />
                   <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                     <InputRow label="运营负责人" required isSelect />
+                     <div className="col-span-2">
+                        <InputRow label="运营负责人" required isSelect />
+                     </div>
                      <InputRow label="文案等级" required isSelect />
                      <InputRow label="图片等级" required isSelect />
-                     <InputRow label="参考链接" required />
                      <div className="col-span-2 grid grid-cols-2 gap-4 mt-1">
-                        <TextAreaGroup label="开发卖点" required height="h-20" limit="0 / 1300" />
-                        <TextAreaGroup label="文案要求" required height="h-20" limit="0 / 1300" />
                         <TextAreaGroup label="图片要求" required height="h-20" limit="0 / 1300" />
+                        <TextAreaGroup label="文案要求" required height="h-20" limit="0 / 1300" />
+                        
+                        <TextAreaGroup label="开发卖点" required height="h-20" limit="0 / 1300" />
                         <div className="flex flex-col space-y-1">
                            <span className="text-slate-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-tight"><span className="text-red-500 mr-0.5">*</span>参考图片：</span>
                            <label className="h-[80px] border border-dashed border-slate-200 dark:border-gray-600 rounded-md bg-slate-50 dark:bg-gray-800 flex flex-col items-center justify-center text-blue-600 font-bold text-[9px] cursor-pointer hover:bg-blue-50 transition-all shadow-inner relative overflow-hidden group">
@@ -275,6 +318,10 @@ const SampleEditSection = ({ samples, activeTab, setLayoutMode }) => {
                                 </>
                               )}
                            </label>
+                        </div>
+
+                        <div className="col-span-2 mt-1">
+                           <InputRow label="参考链接" required />
                         </div>
                      </div>
                   </div>
@@ -304,17 +351,24 @@ const SampleEditSection = ({ samples, activeTab, setLayoutMode }) => {
 
       {/* 底部操作按钮 */}
       <div className="bg-white dark:bg-gray-900 border-t border-slate-200 dark:border-gray-800 px-6 py-4 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <div>
-           {hasChanges && <span className="text-amber-500 font-bold text-[11px] animate-pulse ml-2">● 您有未保存的修改</span>}
+        <div className="flex items-center space-x-4">
+           {hasChanges && <span className="text-amber-500 font-bold text-[11px] animate-pulse ml-2 flex items-center"><RefreshCw size={12} className="mr-1.5" /> 您有未保存的修改</span>}
+           <div className="flex items-center space-x-2 text-[9px] text-slate-400 font-medium">
+              <span className="bg-slate-100 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-gray-700">Ctrl + S 保存</span>
+              <span className="bg-slate-100 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-gray-700">Ctrl + Enter 下一个</span>
+           </div>
         </div>
         <div className="flex space-x-3">
           <button 
-            disabled={isSyncing}
-            onClick={handleSyncAll}
-            className={`px-6 py-1.5 border border-emerald-500 rounded-[3px] text-[12px] font-bold transition-all flex items-center group ${isSyncing ? 'bg-emerald-50 text-emerald-400 border-emerald-200' : 'text-emerald-600 hover:bg-emerald-50 active:scale-95'}`}
+            onClick={handleSaveAndNext}
+            className="px-6 py-1.5 border border-emerald-500 text-emerald-600 rounded-[3px] text-[12px] font-bold hover:bg-emerald-50 transition-all active:scale-95 flex items-center group"
           >
-            <RefreshCw size={14} className={`mr-2 ${isSyncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-            {isSyncing ? '同步中...' : '一键应用到所有样品'}
+            {isLastSample ? '保存并返回列表' : '保存并编辑下一个'}
+            {isLastSample ? (
+              <List size={14} className="ml-1.5 text-slate-400" />
+            ) : (
+              <ChevronRight size={14} className="ml-1 group-hover:translate-x-0.5 transition-transform" />
+            )}
           </button>
           <button 
             onClick={handleCancelClick}

@@ -331,16 +331,19 @@ const ProductDetailModal = ({ onClose }) => {
           <SampleEditSection samples={samples} activeTab={activeTab} setActiveTab={setActiveTab} setLayoutMode={setLayoutMode} />
         )}
 
-        {/* 5. 底部公共操作按钮 */}
-        <SupplementActionFooter
-          isSyncing={isSyncing}
-          syncStatus={syncStatus}
-          onSyncAll={handleSyncAll}
-          onSaveAll={layoutMode === 'list' ? null : handleSaveAll}
-          onSubmitAll={handleSubmitAll}
-          onCancel={onClose}
-        />        </div>
-        </div>
+        {/* 5. 底部公共操作按钮 - 编辑模式下隐藏，因为编辑页自带操作栏 */}
+        {layoutMode !== 'edit' && (
+          <SupplementActionFooter
+            isSyncing={isSyncing}
+            syncStatus={syncStatus}
+            onSyncAll={handleSyncAll}
+            onSaveAll={layoutMode === 'list' ? null : handleSaveAll}
+            onSubmitAll={handleSubmitAll}
+            onCancel={onClose}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 

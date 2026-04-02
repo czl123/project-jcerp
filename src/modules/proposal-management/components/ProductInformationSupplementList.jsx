@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, AlertCircle, Copy, Trash2, Edit3, ArrowUpDown, Filter, 
-  ShieldCheck, Zap, Info, FileSearch, Image as ImageIcon, Link as LinkIcon 
+  ShieldCheck, Zap, Info, FileSearch, Image as ImageIcon, Link as LinkIcon,
+  HelpCircle
 } from 'lucide-react';
 
 const ProductInformationSupplementList = ({ 
@@ -44,7 +45,7 @@ const ProductInformationSupplementList = ({
     { group: 'basic', key: 'isCE', label: '是否CE类', width: 'w-[80px]', isRequired: true },
     { group: 'basic', key: 'spec', label: '规格', width: 'w-[80px]', isRequired: true },
     { group: 'basic', key: 'packaging', label: '包装方式', width: 'w-[100px]', isRequired: true },
-    { group: 'basic', key: 'packQty', label: '包装数量', width: 'w-[80px]', isRequired: true },
+    { group: 'basic', key: 'packQty', label: '包装数量', width: 'w-[80px]', isRequired: true, helpText: '示例1: 1pack\n示例2: 1pack+2pack+3pack' },
     { group: 'basic', key: 'colorCode', label: '色号', width: 'w-[80px]', isRequired: false },
     { group: 'basic', key: 'category', label: '二级类目', width: 'w-[120px]', isRequired: false },
     { group: 'basic', key: 'logoReplace', label: 'Logo可替换', width: 'w-[100px]', isRequired: true },
@@ -52,7 +53,7 @@ const ProductInformationSupplementList = ({
     { group: 'basic', key: 'firstLogistics', label: '首单物流方式', width: 'w-[110px]', isRequired: true },
     { group: 'basic', key: 'models', label: '适用机型', width: 'w-[150px]', isRequired: false },
     { group: 'basic', key: 'material', label: '材质明细', width: 'w-[180px]', isRequired: true },
-    { group: 'basic', key: 'isMulti', label: '是否一品多包', width: 'w-[100px]', isRequired: false },
+    { group: 'basic', key: 'isMulti', label: '一品多包', width: 'w-[100px]', isRequired: true },
     { group: 'basic', key: 'pkgQty', label: '包裹数量', width: 'w-[80px]', isRequired: false },
     
     { group: 'specs', key: 'size', label: '尺码', width: 'w-[80px]', isRequired: true },
@@ -95,7 +96,7 @@ const ProductInformationSupplementList = ({
       return allColumns.filter(c => c.group === 'base' || keys.includes(c.key));
     }
     if (viewMode === '基础属性视图') {
-      const keys = ['brand', 'pattern', 'color', 'hasBattery', 'isCE', 'spec', 'packaging', 'packQty', 'colorCode', 'category', 'logoReplace', 'suggestLogistics', 'firstLogistics', 'models', 'material'];
+      const keys = ['brand', 'pattern', 'color', 'hasBattery', 'isCE', 'spec', 'packaging', 'packQty', 'colorCode', 'category', 'logoReplace', 'suggestLogistics', 'firstLogistics', 'models', 'material', 'isMulti', 'pkgQty'];
       return allColumns.filter(c => c.group === 'base' || keys.includes(c.key));
     }
     if (viewMode === '规格参数视图') {
@@ -213,8 +214,23 @@ const ProductInformationSupplementList = ({
                   }`}
                   style={col.sticky ? { left: col.offset } : {}}
                 >
-                  <div className="flex items-center whitespace-nowrap overflow-hidden">
-                    <span className="truncate">{col.label}</span>
+                  <div className="flex items-center whitespace-nowrap overflow-visible group/header relative">
+                    <span className="truncate">
+                      {col.label}
+                    </span>
+                    {col.helpText && (
+                      <span className="ml-1 text-slate-400 cursor-help hover:text-blue-500 transition-colors font-bold text-[9px] border border-slate-300 dark:border-gray-600 rounded-full w-3 h-3 flex items-center justify-center bg-white dark:bg-gray-800">
+                        ?
+                        {/* Help Tooltip */}
+                        <div className="invisible group-hover/header:visible absolute left-0 top-full mt-2 z-[10000] bg-slate-800 text-white text-[10px] p-2 rounded shadow-2xl min-w-[160px] font-normal normal-case tracking-normal animate-in fade-in zoom-in-95 duration-200 pointer-events-none">
+                           {col.helpText.split('\n').map((line, i) => (
+                             <div key={i} className={i !== 0 ? 'mt-1' : ''}>{line}</div>
+                           ))}
+                           {/* 小三角 */}
+                           <div className="absolute top-0 left-2 -translate-y-full w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[5px] border-b-slate-800"></div>
+                        </div>
+                      </span>
+                    )}
                   </div>
                 </th>
               ))}
@@ -298,8 +314,8 @@ const DynamicCell = ({ col, sample, editingCell, setEditingCell, onUpdate }) => 
     col.sticky ? 'sticky z-20 bg-white dark:bg-gray-950 shadow-[1px_0_0_0_#f1f5f9]' : ''
   } ${isEditing ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''} ${
     isMissingRequired && !isEditing ? 'bg-red-50/50 dark:bg-red-900/10' : ''
-  }`;
-  
+  } hover:z-[50]`; // 👈 悬浮时显著提升层级，确保气泡在最前
+
   const style = col.sticky ? { left: col.offset } : {};
 
   const handleKeyDown = (e) => {
@@ -365,16 +381,16 @@ const DynamicCell = ({ col, sample, editingCell, setEditingCell, onUpdate }) => 
               {textValue}
             </span>
             
-            {/* Tooltip 预览气泡 - 移除长度限制 */}
+            {/* Tooltip 预览气泡 - 优化定位与层级逻辑 */}
             {!isEditing && textValue !== '-' && (
-              <div className="invisible group-hover/cell:visible fixed z-[100] bg-slate-800 dark:bg-slate-700 text-white text-[11px] p-2.5 rounded shadow-xl max-w-[300px] break-words whitespace-normal pointer-events-none -translate-y-full -translate-x-4 mb-2 animate-in fade-in zoom-in-95 duration-200 border border-slate-600">
+              <div className="invisible group-hover/cell:visible fixed z-[9999] bg-slate-800 dark:bg-slate-700 text-white text-[11px] p-2.5 rounded shadow-2xl max-w-[300px] break-words whitespace-normal pointer-events-none translate-y-7 translate-x-2 animate-in fade-in zoom-in-95 duration-200 border border-slate-600">
                 <div className="font-bold text-slate-400 mb-1 border-b border-slate-600 pb-1 flex items-center justify-between">
                    <span>{col.label}</span>
                    <span className="text-[9px] font-normal bg-slate-600 px-1 rounded ml-2">完整预览</span>
                 </div>
                 {textValue}
-                {/* 气泡小三角 */}
-                <div className="absolute bottom-0 left-6 translate-y-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-slate-800 dark:border-t-slate-700"></div>
+                {/* 气泡小三角 - 修复指向 */}
+                <div className="absolute top-0 left-4 -translate-y-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-slate-800 dark:border-t-slate-700"></div>
               </div>
             )}
 
